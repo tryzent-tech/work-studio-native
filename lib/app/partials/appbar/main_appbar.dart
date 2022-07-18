@@ -40,7 +40,7 @@ class _MainAppbarState extends State<MainAppbar> {
       leadingWidth: 40,
       elevation: 0.0,
       shadowColor: Colors.white,
-      backgroundColor: const Color.fromARGB(255, 102, 74, 180),
+      backgroundColor: Colors.indigo,
       foregroundColor: Colors.amber,
       toolbarHeight: 60,
       titleSpacing: 20,

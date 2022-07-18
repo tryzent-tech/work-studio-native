@@ -66,8 +66,8 @@ dev_dependencies:
 flutter_native_splash:
   color: "#046db8"
   color_dark: "#1a1a1a"
-  image_dark: assets/images/work-studio-splash.png
-  image: assets/images/work-studio-splash.png
+  image_dark: assets/images/ws-splash2.png
+  image: assets/images/ws-splash2.png
   android: true
   ios: true
   web: false
@@ -102,7 +102,7 @@ flutter:
   assets:
     # -----------------------------------------
     - assets/images/work-studio-icon.png
-    - assets/images/work-studio-splash.png
+    - assets/images/ws-splash2.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

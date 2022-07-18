@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../provider/google_signin_provider.dart';
 
@@ -17,13 +18,24 @@ class UserProfile extends StatefulWidget {
 
 class _UserProfileState extends State<UserProfile> {
   final currentUser = FirebaseAuth.instance.currentUser!;
+  final Future<SharedPreferences> _sharedPreferences =
+      SharedPreferences.getInstance();
 
   @override
   void initState() {
-    log(currentUser.uid);
-    log(currentUser.refreshToken!);
-
     super.initState();
+    getAccessToken();
+  }
+
+  getAccessToken() {
+    _sharedPreferences.then((SharedPreferences prefs) {
+      String? idToken = prefs.getString('idToken') ?? "";
+      log(idToken);
+    });
+    _sharedPreferences.then((SharedPreferences prefs) {
+      String? accessToken = prefs.getString('accessToken') ?? "";
+      log(accessToken);
+    });
   }
 
   @override
@@ -88,7 +100,7 @@ class _UserProfileState extends State<UserProfile> {
   AppBar buildAppBar() {
     return AppBar(
       title: const Text("Your Profile"),
-      backgroundColor: const Color.fromARGB(255, 102, 74, 180),
+      backgroundColor: Colors.indigo,
       elevation: 0,
       shadowColor: Colors.transparent,
       toolbarHeight: 55,

@@ -98,7 +98,7 @@ class _GoogleSignInPageState extends State<GoogleSignInPage> {
       shadowColor: Colors.white,
       backgroundColor: Colors.indigo,
       foregroundColor: Colors.amber,
-      toolbarHeight: 50,
+      toolbarHeight: 55,
       titleSpacing: 10,
       titleTextStyle: const TextStyle(
         color: Colors.white,
