@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "715613014480",
+    "project_id": "work-studio-e1b3b",
+    "storage_bucket": "work-studio-e1b3b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:715613014480:android:e55f7867e92562e37f11d5",
+        "android_client_info": {
+          "package_name": "com.workstudio.io.work_studio"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "715613014480-e0ieq6ggh5r36q4rk3120e9bgcijvsal.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDpFQSLTQNdz8J3ejr-32if_lSCGN27JDI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "715613014480-e0ieq6ggh5r36q4rk3120e9bgcijvsal.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
