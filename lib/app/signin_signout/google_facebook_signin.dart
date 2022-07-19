@@ -20,6 +20,12 @@ class _GoogleFacebookSignInPageState extends State<GoogleFacebookSignInPage> {
   Map _userDetails = {};
 
   @override
+  void initState() {
+    log(_userDetails.toString());
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: googleSigninAppbar(),

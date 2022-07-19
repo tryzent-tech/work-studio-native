@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:work_studio/app/main/screens/home.dart';
 
 import '../../provider/google_signin_provider.dart';
 
@@ -30,11 +31,11 @@ class _UserProfileState extends State<UserProfile> {
   getAccessToken() {
     _sharedPreferences.then((SharedPreferences prefs) {
       String? idToken = prefs.getString('idToken') ?? "";
-      log(idToken);
+      // log(idToken);
     });
     _sharedPreferences.then((SharedPreferences prefs) {
       String? accessToken = prefs.getString('accessToken') ?? "";
-      log(accessToken);
+      // log(accessToken);
     });
   }
 
@@ -88,6 +89,25 @@ class _UserProfileState extends State<UserProfile> {
                         fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                 ),
+              ),
+              const SizedBox(height: 20),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 40),
+                child: Center(
+                    child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      primary: const Color.fromARGB(255, 4, 68, 120),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 28, vertical: 14)),
+                  child: const Text("Go to Work Studio"),
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute<void>(
+                      builder: (BuildContext context) {
+                        return const Homepage();
+                      },
+                    ));
+                  },
+                )),
               ),
             ],
           ),
