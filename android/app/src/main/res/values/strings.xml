@@ -6,8 +6,8 @@
 
      <string name="app_name">Work Studio</string>
      <string name="facebook_app_id">791324191902072</string>
+     <string name="fb_login_protocol_scheme">fb791324191902072</string>
      <string name="facebook_client_token">97c645b133514bf4775996477d4de93f</string>
-     <string name="fb_login_protocol_scheme">fb97c645b133514bf4775996477d4de93f</string>
 
 
 </resources>
