@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:work_studio/app/helpers/login_data_modal.dart';
 import 'package:work_studio/app/partials/tools/native_action_button.dart';
 import 'package:work_studio/app/partials/tools/social_auth_button.dart';
 import 'package:work_studio/app/partials/tools/text_form_field.dart';
@@ -164,6 +165,18 @@ class _LoginPageState extends State<LoginPage> {
     setState(() {
       isProcessSocialLogin = false;
     });
+    LoginDataModal loginDataModal = LoginDataModal(
+      avatar: '',
+      email: '',
+      firstname: '',
+      id: '',
+      lastname: '',
+      source: '',
+      token: '',
+      username: '',
+    );
+
+    print(loginDataModal.id);
   }
 
 //---------------------------------------------------------------------------------
@@ -174,11 +187,22 @@ class _LoginPageState extends State<LoginPage> {
       });
       FacebookAuth.instance
           .login(permissions: ["public_profile", "email"]).then((value) {
-        FacebookAuth.instance.getUserData().then((userInfo) {
+        FacebookAuth.instance.getUserData().then((userInfo) async {
           print(userInfo.toString());
+          AccessToken? accessToken = await FacebookAuth.instance.accessToken;
+          print(accessToken!.token);
           setState(() {
             isProcessSocialLogin = false;
           });
+
+          // payload.username = data.email;
+          // payload.email = data.email;
+          // payload.firstname = data.firstName;
+          // payload.lastname = data.lastName;
+          // payload.id = data.id;
+          // payload.source = 'google';
+          // payload.avatar = data.photoUrl;
+          // payload.token = data.idToken;
         });
       });
     } catch (e) {
