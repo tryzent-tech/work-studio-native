@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -6,39 +8,45 @@ import 'package:shared_preferences/shared_preferences.dart';
 class GoggleSignInProvider extends ChangeNotifier {
   final googleSignin = GoogleSignIn();
 
-  GoogleSignInAccount? _user;
+  GoogleSignInAccount? _googleUserInformation;
 
-  GoogleSignInAccount get user => _user!;
+  GoogleSignInAccount get user => _googleUserInformation!;
 
-  Future<Object> googleLogin() async {
-    final Future<SharedPreferences> _sharedPreferences =
-        SharedPreferences.getInstance();
-
+  Future<GoogleSignInAccount?> googleLogin() async {
     try {
+      final Future<SharedPreferences> _sharedPreferences =
+          SharedPreferences.getInstance();
+
       final SharedPreferences _preferences = await _sharedPreferences;
 
-      final googleUser = await googleSignin.signIn();
-      if (googleUser != null) {
-        _user = googleUser;
+      final googleUserInfo = await googleSignin.signIn();
+
+      if (googleUserInfo != null) {
+        _googleUserInformation = googleUserInfo;
       }
 
-      final googleAuth = await googleUser!.authentication;
+      final googleAuth = await googleUserInfo!.authentication;
       final credential = GoogleAuthProvider.credential(
-          accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
 
-      Object userCredential =
-          await FirebaseAuth.instance.signInWithCredential(credential);
+      await FirebaseAuth.instance.signInWithCredential(credential);
 
       _preferences.setString("idToken", googleAuth.accessToken!);
       _preferences.setString("accessToken", googleAuth.idToken!);
-      return googleUser;
-    } on Exception catch (e) {
-      // ignore: avoid_print
-      print(e.toString());
-      return {};
-    }
 
-    notifyListeners();
+      notifyListeners();
+
+      return googleUserInfo;
+      //
+    } on Exception catch (e) {
+      //
+      notifyListeners();
+      //
+      print(e.toString());
+      return _googleUserInformation;
+    }
   }
 
   Future googleLogout() async {

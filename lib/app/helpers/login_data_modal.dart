@@ -6,7 +6,8 @@ class LoginDataModal {
   final String lastname;
   final String source;
   final String avatar;
-  final String token;
+  final String idToken;
+  final String accessToken;
 
   LoginDataModal({
     required this.id,
@@ -16,6 +17,7 @@ class LoginDataModal {
     required this.lastname,
     required this.source,
     required this.avatar,
-    required this.token,
+    required this.idToken,
+    required this.accessToken,
   });
 }

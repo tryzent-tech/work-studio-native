@@ -1,8 +1,13 @@
 // ignore_for_file: avoid_print
 
+import 'dart:developer';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:work_studio/app/helpers/login_data_modal.dart';
 import 'package:work_studio/app/partials/tools/native_action_button.dart';
 import 'package:work_studio/app/partials/tools/please_wait_indicator.dart';
@@ -19,6 +24,9 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final Future<SharedPreferences> _sharedPreferences =
+      SharedPreferences.getInstance();
+
   TextEditingController phoneNumber = TextEditingController();
   TextEditingController phoneOTP = TextEditingController();
 
@@ -146,27 +154,31 @@ class _LoginPageState extends State<LoginPage> {
   //---------------------------------------------------------------------------------
 
   void loginWithGoggle(BuildContext context) async {
-    setState(() {
-      isProcessSocialLogin = true;
-    });
+    setState(() => isProcessSocialLogin = true);
     final provider = Provider.of<GoggleSignInProvider>(context, listen: false);
-    Object googleLogin = await provider.googleLogin();
-    print(googleLogin.toString());
-    setState(() {
-      isProcessSocialLogin = false;
-    });
-    LoginDataModal loginDataModal = LoginDataModal(
-      avatar: '',
-      email: '',
-      firstname: '',
-      id: '',
-      lastname: '',
-      source: '',
-      token: '',
-      username: '',
-    );
+    GoogleSignInAccount? userInfo = await provider.googleLogin();
+    setState(() => isProcessSocialLogin = false);
+    redirectToWebPageByGoogle(userInfo);
+  }
 
-    print(loginDataModal.id);
+//---------------------------------------------------------------------------------
+  redirectToWebPageByGoogle(GoogleSignInAccount? userInfo) async {
+    final SharedPreferences prefs = await _sharedPreferences;
+
+    String? idToken = prefs.getString('idToken') ?? "";
+    String? accessToken = prefs.getString('accessToken') ?? "";
+
+    LoginDataModal loginDataModal = LoginDataModal(
+      source: "GOOGLE",
+      id: userInfo!.id,
+      idToken: idToken,
+      email: userInfo.email,
+      username: userInfo.email,
+      accessToken: accessToken,
+      avatar: userInfo.photoUrl.toString(),
+      firstname: userInfo.displayName.toString(),
+      lastname: userInfo.displayName.toString(),
+    );
   }
 
 //---------------------------------------------------------------------------------
