@@ -10,7 +10,7 @@ class GoggleSignInProvider extends ChangeNotifier {
 
   GoogleSignInAccount get user => _user!;
 
-  Future googleLogin() async {
+  Future<Object> googleLogin() async {
     final Future<SharedPreferences> _sharedPreferences =
         SharedPreferences.getInstance();
 
@@ -29,9 +29,11 @@ class GoggleSignInProvider extends ChangeNotifier {
 
       _preferences.setString("idToken", googleAuth.accessToken!);
       _preferences.setString("accessToken", googleAuth.idToken!);
+      return googleUser;
     } on Exception catch (e) {
       // ignore: avoid_print
       print(e.toString());
+      return {};
     }
 
     notifyListeners();
