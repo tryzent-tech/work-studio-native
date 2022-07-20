@@ -104,6 +104,10 @@ flutter:
     # -----------------------------------------
     - assets/images/work-studio-icon.png
     - assets/images/ws-splash2.png
+    - assets/images/login-img.png
+    - assets/images/ws-long-logo.png
+    - assets/icons/fb-icon.png
+    - assets/icons/google-icon.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

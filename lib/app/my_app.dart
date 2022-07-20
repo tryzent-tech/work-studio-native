@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:work_studio/app/login/login.dart';
 import 'package:work_studio/app/provider/google_signin_provider.dart';
 
 import 'main/layouts/layout_page.dart';
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: "Work Studio",
         home: Material(
-          child: LayoutPage(),
+          child: LoginPage(),
         ),
       ),
     );

@@ -127,7 +127,10 @@ class _FacebookUserProfileState extends State<FacebookUserProfile> {
       shadowColor: Colors.transparent,
       toolbarHeight: 55,
       leading: IconButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        splashRadius: 20,
         icon: const Icon(
           Icons.arrow_back_outlined,
           color: Colors.white,
@@ -137,6 +140,7 @@ class _FacebookUserProfileState extends State<FacebookUserProfile> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: IconButton(
+            splashRadius: 20,
             onPressed: () {
               final provider =
                   Provider.of<GoggleSignInProvider>(context, listen: false);
