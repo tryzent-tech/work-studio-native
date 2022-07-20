@@ -44,11 +44,11 @@ dependencies:
   connectivity:
   flutter_native_splash:
   flutter_launcher_icons:
-  page_transition: ^2.0.2
   font_awesome_flutter: ^10.1.0
   shared_preferences: ^2.0.6
   url_launcher: ^6.0.9
   webview_flutter:
+  page_transition: ^2.0.9
 
   # ------------------------------------------
   firebase_core: ^1.19.2

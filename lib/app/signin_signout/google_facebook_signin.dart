@@ -1,9 +1,14 @@
+// ignore_for_file: avoid_print
+
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:work_studio/app/main/screens/facebook_user_profile.dart';
 import 'package:work_studio/app/provider/google_signin_provider.dart';
 
 class GoogleFacebookSignInPage extends StatefulWidget {
@@ -19,10 +24,34 @@ class _GoogleFacebookSignInPageState extends State<GoogleFacebookSignInPage> {
   bool isFacebookLoggedIn = false;
   Map _userDetails = {};
 
+  final Future<SharedPreferences> _sharedPreferences =
+      SharedPreferences.getInstance();
+
   @override
   void initState() {
     log(_userDetails.toString());
+    isLoggedInUser();
     super.initState();
+  }
+
+  isLoggedInUser() {
+    _sharedPreferences.then((SharedPreferences prefs) {
+      bool? _userIsLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+      if (_userIsLoggedIn) {
+        pageNavigation(childWidget: const FacebookUserProfile());
+      }
+    });
+  }
+
+  void pageNavigation({required Widget childWidget}) {
+    Navigator.push(
+      context,
+      PageTransition(
+        child: childWidget,
+        type: PageTransitionType.rightToLeft,
+        duration: const Duration(milliseconds: 300),
+      ),
+    );
   }
 
   @override
@@ -37,7 +66,7 @@ class _GoogleFacebookSignInPageState extends State<GoogleFacebookSignInPage> {
               child: const Center(
                 child: Image(
                   image: NetworkImage(
-                    "https://redchalkstudios.com/wp-content/uploads/2020/05/logos-fbgoogle.png",
+                    "https://media.kasperskydaily.com/wp-content/uploads/sites/36/2015/11/05092303/google-facebook-featured.png",
                   ),
                   height: 220,
                 ),
@@ -46,11 +75,11 @@ class _GoogleFacebookSignInPageState extends State<GoogleFacebookSignInPage> {
             const SizedBox(height: 200),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 4),
-              child: googleLoginButton(context),
+              child: facebookLoginButton(context),
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 4),
-              child: facebookLoginButton(context),
+              child: googleLoginButton(context),
             ),
           ],
         ),
@@ -140,19 +169,28 @@ class _GoogleFacebookSignInPageState extends State<GoogleFacebookSignInPage> {
   void facebookLogin() async {
     try {
       FacebookAuth.instance
-          .login(permissions: ["public_profile", "email"]).then((v) {
-        FacebookAuth.instance.getUserData().then((v) {
+          .login(permissions: ["public_profile", "email"]).then((value) {
+        FacebookAuth.instance.getUserData().then((userInfo) {
           setState(() {
             isFacebookLoggedIn = true;
-            _userDetails = v;
+            _userDetails = userInfo;
           });
-          log(isFacebookLoggedIn.toString());
+          setLoginStatus(_userDetails);
         });
       });
     } catch (e) {
-      // ignore: avoid_print
       print(e.toString());
     }
+  }
+
+  void setLoginStatus(Map _userDetails) async {
+    final SharedPreferences _preferences = await _sharedPreferences;
+    _preferences.setBool("isLoggedIn", true);
+    _preferences.setString("userName", _userDetails['name']);
+    _preferences.setString("email", _userDetails['email']);
+    _preferences.setString(
+        "profileImage", _userDetails['picture']['data']['url']);
+    isLoggedInUser();
   }
 
 //---------------------------------------------------------------------------------
