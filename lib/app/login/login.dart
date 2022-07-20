@@ -5,6 +5,7 @@ import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:work_studio/app/helpers/login_data_modal.dart';
 import 'package:work_studio/app/partials/tools/native_action_button.dart';
+import 'package:work_studio/app/partials/tools/please_wait_indicator.dart';
 import 'package:work_studio/app/partials/tools/social_auth_button.dart';
 import 'package:work_studio/app/partials/tools/text_form_field.dart';
 import 'package:work_studio/app/provider/google_signin_provider.dart';
@@ -127,18 +128,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               Builder(builder: (context) {
                 if (isProcessSocialLogin) {
-                  return SafeArea(
-                    child: Column(
-                      children: [
-                        SizedBox(height: screenSize.height / 2 - 160),
-                        const Center(
-                            child: CircularProgressIndicator(
-                          color: Color.fromARGB(255, 104, 60, 226),
-                          strokeWidth: 5,
-                        )),
-                      ],
-                    ),
-                  );
+                  return customProgressIndicator(screenSize);
                 } else {
                   return const SizedBox.shrink();
                 }
