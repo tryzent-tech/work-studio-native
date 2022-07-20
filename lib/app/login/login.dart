@@ -190,21 +190,24 @@ class _LoginPageState extends State<LoginPage> {
       FacebookAuth.instance
           .login(permissions: ["public_profile", "email"]).then((value) {
         FacebookAuth.instance.getUserData().then((userInfo) async {
-          print(userInfo.toString());
-          AccessToken? accessToken = await FacebookAuth.instance.accessToken;
-          print(accessToken!.token);
           setState(() {
             isProcessSocialLogin = false;
           });
 
-          // payload.username = data.email;
-          // payload.email = data.email;
-          // payload.firstname = data.firstName;
-          // payload.lastname = data.lastName;
-          // payload.id = data.id;
-          // payload.source = 'google';
-          // payload.avatar = data.photoUrl;
-          // payload.token = data.idToken;
+          AccessToken? accessToken = await FacebookAuth.instance.accessToken;
+          LoginDataModal loginDataModal = LoginDataModal(
+            source: "FACEBOOK",
+            id: userInfo["id"],
+            idToken: "",
+            email: userInfo["email"] ?? "",
+            username: userInfo["email"] ?? "",
+            firstname: userInfo["name"] ?? "",
+            lastname: userInfo["name"] ?? "",
+            accessToken: accessToken!.token,
+            avatar: userInfo["picture"]["data"]["url"] ?? "",
+          );
+
+          log(loginDataModal.email);
         });
       });
     } catch (e) {
