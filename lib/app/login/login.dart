@@ -84,7 +84,9 @@ class _LoginPageState extends State<LoginPage> {
                         const SizedBox(height: 5),
                         nativeActionButton(
                           buttonText: 'Submit',
-                          onPressed: () {},
+                          onPressed: () {
+                            submitFormWithPhoneLogin();
+                          },
                         ),
                       ],
                     );
@@ -129,7 +131,7 @@ class _LoginPageState extends State<LoginPage> {
               keyboardType: TextInputType.phone,
               controller: phoneNumber,
               fieldType: 'phoneNumber',
-              errorText: 'Please enter phone number',
+              errorText: 'Please enter valid phone number',
             ),
           ],
         ),
@@ -232,6 +234,19 @@ class _LoginPageState extends State<LoginPage> {
   void getOTP() {
     if (_phoneNumberFormKey.currentState!.validate() &&
         _phoneNumberFormKey.currentState != null) {
+      setState(() {
+        isPhoneNumberSent = true;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Form submit successfully.')),
+      );
+    }
+  }
+
+  //---------------------------------------------------------------------------------
+  void submitFormWithPhoneLogin() {
+    if (_phoneOTPFormKey.currentState!.validate() &&
+        _phoneOTPFormKey.currentState != null) {
       setState(() {
         isPhoneNumberSent = true;
       });
