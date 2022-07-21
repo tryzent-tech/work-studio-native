@@ -8,9 +8,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:work_studio/app/helpers/login_data_modal.dart';
+import 'package:work_studio/app/helpers/login_object_helper.dart';
+import 'package:work_studio/app/helpers/url_helper.dart';
+import 'package:work_studio/app/main/screens/webview_homepage.dart';
 import 'package:work_studio/app/partials/tools/native_action_button.dart';
 import 'package:work_studio/app/partials/tools/please_wait_indicator.dart';
 import 'package:work_studio/app/partials/tools/social_auth_button.dart';
@@ -153,83 +157,6 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  //---------------------------------------------------------------------------------
-
-  void loginWithGoggle(BuildContext context) async {
-    setState(() => isProcessSocialLogin = true);
-    final provider = Provider.of<GoggleSignInProvider>(context, listen: false);
-    GoogleSignInAccount? userInfo = await provider.googleLogin();
-    setState(() => isProcessSocialLogin = false);
-    redirectToWebPageByGoogle(userInfo);
-  }
-
-//---------------------------------------------------------------------------------
-  redirectToWebPageByGoogle(GoogleSignInAccount? userInfo) async {
-    final SharedPreferences prefs = await _sharedPreferences;
-
-    String? idToken = prefs.getString('idToken') ?? "";
-    String? accessToken = prefs.getString('accessToken') ?? "";
-
-    LoginDataModal loginDataModal = LoginDataModal(
-      source: "GOOGLE",
-      id: userInfo!.id,
-      email: userInfo.email,
-      username: userInfo.email,
-      avatar: userInfo.photoUrl.toString(),
-      firstname: userInfo.displayName.toString(),
-      lastname: userInfo.displayName.toString(),
-      otp: '',
-      password: '',
-    );
-
-    Map mappedUsersDetails = loginDataModal.toMap();
-    String rawJson = jsonEncode(mappedUsersDetails);
-    List<int> bytes = utf8.encode(rawJson);
-    final base64String = base64.encode(bytes);
-    print(base64String);
-    log("idToken = " + idToken);
-    log("accessToken = " + accessToken);
-  }
-
-//---------------------------------------------------------------------------------
-  void loginWithFacebook() async {
-    try {
-      setState(() {
-        isProcessSocialLogin = true;
-      });
-      FacebookAuth.instance
-          .login(permissions: ["public_profile", "email"]).then((value) {
-        FacebookAuth.instance.getUserData().then((userInfo) async {
-          setState(() {
-            isProcessSocialLogin = false;
-          });
-
-          AccessToken? accessToken = await FacebookAuth.instance.accessToken;
-
-          LoginDataModal loginDataModal = LoginDataModal(
-            source: "FACEBOOK",
-            id: userInfo["id"],
-            email: userInfo["email"] ?? "",
-            username: userInfo["email"] ?? "",
-            firstname: userInfo["name"] ?? "",
-            lastname: userInfo["name"] ?? "",
-            avatar: userInfo["picture"]["data"]["url"] ?? "",
-            otp: '',
-            password: '',
-          );
-          Map mappedUsersDetails = loginDataModal.toMap();
-
-          String rawJson = jsonEncode(mappedUsersDetails);
-          List<int> bytes = utf8.encode(rawJson);
-          final base64String = base64.encode(bytes);
-          print(base64String);
-        });
-      });
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
 //---------------------------------------------------------------------------------
   Container mobileNumberFormField() {
     return Container(
@@ -367,5 +294,80 @@ class _LoginPageState extends State<LoginPage> {
       );
     }
   }
+
+  //---------------------------------------------------------------------------------
+
+  void loginWithGoggle(BuildContext context) async {
+    setState(() => isProcessSocialLogin = true);
+    final provider = Provider.of<GoggleSignInProvider>(context, listen: false);
+    GoogleSignInAccount? userInfo = await provider.googleLogin();
+    setState(() => isProcessSocialLogin = false);
+    googleRedirectPage(userInfo);
+  }
+
+//---------------------------------------------------------------------------------
+  googleRedirectPage(GoogleSignInAccount? userInfo) async {
+    final SharedPreferences prefs = await _sharedPreferences;
+    //
+    String? idToken = prefs.getString('idToken') ?? "";
+    String? accessToken = prefs.getString('accessToken') ?? "";
+    //
+    LoginDataModal loginDataModal = createGoogleLoginPayload(userInfo);
+
+    Map mappedUsersDetails = loginDataModal.toMap();
+    String rawJson = jsonEncode(mappedUsersDetails);
+    List<int> bytes = utf8.encode(rawJson);
+    final base64String = base64.encode(bytes);
+
+    String mainURL = getDevelopmentURL(base64String, idToken, accessToken);
+
+    navigateToWebViewPage(mainURL);
+  }
+
+//---------------------------------------------------------------------------------
+  void loginWithFacebook() async {
+    try {
+      setState(() {
+        isProcessSocialLogin = true;
+      });
+      FacebookAuth.instance
+          .login(permissions: ["public_profile", "email"]).then((value) {
+        FacebookAuth.instance.getUserData().then((userInfo) async {
+          setState(() {
+            isProcessSocialLogin = false;
+          });
+
+          AccessToken? accessToken = await FacebookAuth.instance.accessToken;
+          LoginDataModal loginDataModal = createFacebookLoginPayload(userInfo);
+
+          Map mappedUsersDetails = loginDataModal.toMap();
+
+          String rawJson = jsonEncode(mappedUsersDetails);
+          List<int> bytes = utf8.encode(rawJson);
+          final base64String = base64.encode(bytes);
+
+          String mainURL =
+              getDevelopmentURL(base64String, "", accessToken.toString());
+
+          navigateToWebViewPage(mainURL);
+        });
+      });
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+//---------------------------------------------------------------------------------
+  void navigateToWebViewPage(String mainURL) {
+    Navigator.push(
+      context,
+      PageTransition(
+        child: WebViewHomepage(mainURL: mainURL),
+        type: PageTransitionType.rightToLeft,
+        duration: const Duration(milliseconds: 300),
+      ),
+    );
+  }
+
   //---------------------------------------------------------------------------------
 }
