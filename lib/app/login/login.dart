@@ -1,6 +1,8 @@
 // ignore_for_file: avoid_print
 
+import 'dart:convert';
 import 'dart:developer';
+import 'dart:typed_data';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -171,14 +173,22 @@ class _LoginPageState extends State<LoginPage> {
     LoginDataModal loginDataModal = LoginDataModal(
       source: "GOOGLE",
       id: userInfo!.id,
-      idToken: idToken,
       email: userInfo.email,
       username: userInfo.email,
-      accessToken: accessToken,
       avatar: userInfo.photoUrl.toString(),
       firstname: userInfo.displayName.toString(),
       lastname: userInfo.displayName.toString(),
+      otp: '',
+      password: '',
     );
+
+    Map mappedUsersDetails = loginDataModal.toMap();
+    String rawJson = jsonEncode(mappedUsersDetails);
+    List<int> bytes = utf8.encode(rawJson);
+    final base64String = base64.encode(bytes);
+    print(base64String);
+    log("idToken = " + idToken);
+    log("accessToken = " + accessToken);
   }
 
 //---------------------------------------------------------------------------------
@@ -195,19 +205,24 @@ class _LoginPageState extends State<LoginPage> {
           });
 
           AccessToken? accessToken = await FacebookAuth.instance.accessToken;
+
           LoginDataModal loginDataModal = LoginDataModal(
             source: "FACEBOOK",
             id: userInfo["id"],
-            idToken: "",
             email: userInfo["email"] ?? "",
             username: userInfo["email"] ?? "",
             firstname: userInfo["name"] ?? "",
             lastname: userInfo["name"] ?? "",
-            accessToken: accessToken!.token,
             avatar: userInfo["picture"]["data"]["url"] ?? "",
+            otp: '',
+            password: '',
           );
+          Map mappedUsersDetails = loginDataModal.toMap();
 
-          log(loginDataModal.email);
+          String rawJson = jsonEncode(mappedUsersDetails);
+          List<int> bytes = utf8.encode(rawJson);
+          final base64String = base64.encode(bytes);
+          print(base64String);
         });
       });
     } catch (e) {
