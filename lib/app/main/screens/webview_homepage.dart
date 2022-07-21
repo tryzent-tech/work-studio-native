@@ -33,7 +33,7 @@ class _WebViewHomepageState extends State<WebViewHomepage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 205, 232, 237),
+      backgroundColor: const Color.fromARGB(1, 237, 242, 246),
       appBar: PreferredSize(
         preferredSize: const Size(60, 0),
         child: MainAppbar(

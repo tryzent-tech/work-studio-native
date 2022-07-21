@@ -15,11 +15,14 @@ import 'package:work_studio/app/helpers/login_data_modal.dart';
 import 'package:work_studio/app/helpers/login_object_helper.dart';
 import 'package:work_studio/app/helpers/url_helper.dart';
 import 'package:work_studio/app/main/screens/webview_homepage.dart';
+import 'package:work_studio/app/modals/otp_response_modal.dart';
+import 'package:work_studio/app/modals/send_otp_modal.dart';
 import 'package:work_studio/app/partials/tools/native_action_button.dart';
 import 'package:work_studio/app/partials/tools/please_wait_indicator.dart';
 import 'package:work_studio/app/partials/tools/social_auth_button.dart';
 import 'package:work_studio/app/partials/tools/text_form_field.dart';
 import 'package:work_studio/app/provider/google_signin_provider.dart';
+import 'package:work_studio/app/services/login_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({
@@ -41,6 +44,19 @@ class _LoginPageState extends State<LoginPage> {
 
   bool isPhoneNumberSent = false;
   bool isProcessSocialLogin = false;
+
+  LoginService loginService = LoginService();
+
+  @override
+  void initState() {
+    super.initState();
+    sendOtpModal();
+  }
+
+  sendOtpModal() async {
+    OtpResponseModal responseModal = await loginService.getOTP("9835405715");
+    print(responseModal.data.accessToken);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -320,6 +336,8 @@ class _LoginPageState extends State<LoginPage> {
     final base64String = base64.encode(bytes);
 
     String mainURL = getDevelopmentURL(base64String, idToken, accessToken);
+
+    log(mainURL);
 
     navigateToWebViewPage(mainURL);
   }
