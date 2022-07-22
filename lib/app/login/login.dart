@@ -50,12 +50,6 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-    sendOtpModal();
-  }
-
-  sendOtpModal() async {
-    OtpResponseModal responseModal = await loginService.getOTP("9835405715");
-    print(responseModal.data.accessToken);
   }
 
   @override
@@ -111,7 +105,7 @@ class _LoginPageState extends State<LoginPage> {
                             nativeActionButton(
                                 buttonText: 'Get OTP',
                                 onPressed: () {
-                                  getOTP();
+                                  sendNumberAndGetOTP();
                                 }),
                           ],
                         );
@@ -286,28 +280,40 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   //---------------------------------------------------------------------------------
-  void getOTP() {
+  void sendNumberAndGetOTP() async {
     if (_phoneNumberFormKey.currentState!.validate() &&
         _phoneNumberFormKey.currentState != null) {
-      setState(() {
-        isPhoneNumberSent = true;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Form submit successfully.')),
-      );
+//
+      OtpResponseModal responseModal =
+          await loginService.getOTPFromServer(phoneNumber.text);
+
+      if (responseModal.status == "success") {
+        setState(() => isPhoneNumberSent = true);
+      } else {
+        setState(() => isPhoneNumberSent = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(responseModal.message),
+            backgroundColor: const Color.fromARGB(255, 239, 40, 26),
+          ),
+        );
+      }
     }
   }
 
   //---------------------------------------------------------------------------------
-  void submitFormWithPhoneLogin() {
+  void submitFormWithPhoneLogin() async {
     if (_phoneOTPFormKey.currentState!.validate() &&
         _phoneOTPFormKey.currentState != null) {
-      setState(() {
-        isPhoneNumberSent = true;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Form submit successfully.')),
-      );
+      LoginDataModal loginDataModal = createMobileLoginPayload(phoneOTP.text);
+      Map mappedUsersDetails = loginDataModal.toMap();
+      String rawJson = jsonEncode(mappedUsersDetails);
+      List<int> bytes = utf8.encode(rawJson);
+      final base64String = base64.encode(bytes);
+
+      //   String mainURL = getDevelopmentURL(base64String, idToken, accessToken);
+
+      //   navigateToWebViewPage(mainURL);
     }
   }
 
@@ -335,7 +341,8 @@ class _LoginPageState extends State<LoginPage> {
     List<int> bytes = utf8.encode(rawJson);
     final base64String = base64.encode(bytes);
 
-    String mainURL = getDevelopmentURL(base64String, idToken, accessToken);
+    // String mainURL = getDevelopmentURL(base64String, idToken, accessToken);
+    String mainURL = getDevelopmentURL(base64String, idToken, "not-found");
 
     log(mainURL);
 
@@ -365,7 +372,9 @@ class _LoginPageState extends State<LoginPage> {
           final base64String = base64.encode(bytes);
 
           String mainURL =
-              getDevelopmentURL(base64String, "", accessToken.toString());
+              getDevelopmentURL(base64String, "not-found", accessToken!.token);
+
+          log(mainURL);
 
           navigateToWebViewPage(mainURL);
         });
