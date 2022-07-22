@@ -35,11 +35,11 @@ LoginDataModal createFacebookLoginPayload(Map<String, dynamic> userInfo) {
   LoginDataModal loginDataModal = LoginDataModal(
     source: "FACEBOOK",
     id: userInfo["id"],
-    email: userInfo["email"] ?? "",
-    username: userInfo["email"] ?? "",
-    firstname: userInfo["name"] ?? "",
-    lastname: userInfo["name"] ?? "",
-    avatar: userInfo["picture"]["data"]["url"] ?? "",
+    email: userInfo["email"] ?? "unknown",
+    username: userInfo["email"] ?? "unknown",
+    firstname: userInfo["name"] ?? "unknown",
+    lastname: userInfo["name"] ?? "unknown",
+    avatar: userInfo["picture"]["data"]["url"] ?? "unknown",
     otp: '',
     password: '',
   );

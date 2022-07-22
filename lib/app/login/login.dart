@@ -241,13 +241,30 @@ class _LoginPageState extends State<LoginPage> {
   Container loginpageBannerImage() {
     return Container(
       padding: const EdgeInsets.all(10),
-      child: const Center(
-        child: Image(
-          image: AssetImage(
-            "assets/images/login-img.png",
+      child: GestureDetector(
+        onTap: () {
+          _phoneNumberFormKey.currentState?.reset();
+          _phoneOTPFormKey.currentState?.reset();
+          tapOnWholeScreen(context);
+        },
+        child: const Center(
+          child: Image(
+            image: AssetImage(
+              "assets/images/login-img.png",
+            ),
+            height: 220,
           ),
-          height: 220,
         ),
+      ),
+    );
+  }
+
+//---------------------------------------------------------------------------------
+  void reloadCurrentPage() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => super.widget,
       ),
     );
   }
@@ -366,6 +383,8 @@ class _LoginPageState extends State<LoginPage> {
           LoginDataModal loginDataModal = createFacebookLoginPayload(userInfo);
 
           Map mappedUsersDetails = loginDataModal.toMap();
+
+          log(mappedUsersDetails.toString());
 
           String rawJson = jsonEncode(mappedUsersDetails);
           List<int> bytes = utf8.encode(rawJson);
