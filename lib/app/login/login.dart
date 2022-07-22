@@ -323,18 +323,26 @@ class _LoginPageState extends State<LoginPage> {
         _phoneOTPFormKey.currentState != null &&
         _tempAccessToken != "") {
       //
+
       VerifyOtpResponseModal verifyOtpResponseModal = await loginService
           .verifyOTPFromServer(phoneOTP.text, _tempAccessToken);
 
-      log(verifyOtpResponseModal.status);
+      setState(() => isPhoneNumberSent = false);
+      _phoneNumberFormKey.currentState?.reset();
+      _phoneOTPFormKey.currentState?.reset();
+      tapOnWholeScreen(context);
 
       if (verifyOtpResponseModal.status == "success") {
-        _phoneNumberFormKey.currentState?.reset();
-        _phoneOTPFormKey.currentState?.reset();
-        tapOnWholeScreen(context);
+        //
+        LoginDataModal loginDataModal = createMobileLoginPayload();
+
+        Map mappedUsersDetails = loginDataModal.toMap();
+        String rawJson = jsonEncode(mappedUsersDetails);
+        List<int> bytes = utf8.encode(rawJson);
+        final base64String = base64.encode(bytes);
 
         String mainURL = getDevelopmentURL(
-            "not-found", "not-found", verifyOtpResponseModal.data.accessToken);
+            base64String, "not-found", verifyOtpResponseModal.data.accessToken);
         navigateToWebViewPage(mainURL);
       } else {
         showSnackBar(

@@ -1,17 +1,17 @@
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:work_studio/app/helpers/login_data_modal.dart';
 
-LoginDataModal createMobileLoginPayload(String otp) {
+LoginDataModal createMobileLoginPayload() {
   LoginDataModal loginDataModal = LoginDataModal(
     source: "MOBILE",
-    id: "",
-    email: "",
-    username: "",
-    avatar: "",
-    firstname: "",
-    lastname: "",
-    otp: otp,
-    password: "",
+    id: "unknown",
+    email: "unknown",
+    username: "unknown",
+    avatar: "unknown",
+    firstname: "unknown",
+    lastname: "unknown",
+    otp: "unknown",
+    password: "unknown",
   );
   return loginDataModal;
 }
