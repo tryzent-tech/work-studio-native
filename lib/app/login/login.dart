@@ -2,9 +2,6 @@
 
 import 'dart:convert';
 import 'dart:developer';
-import 'dart:typed_data';
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -16,7 +13,7 @@ import 'package:work_studio/app/helpers/login_object_helper.dart';
 import 'package:work_studio/app/helpers/url_helper.dart';
 import 'package:work_studio/app/main/screens/webview_homepage.dart';
 import 'package:work_studio/app/modals/otp_response_modal.dart';
-import 'package:work_studio/app/modals/send_otp_modal.dart';
+import 'package:work_studio/app/modals/otp_verify_modal.dart';
 import 'package:work_studio/app/partials/tools/native_action_button.dart';
 import 'package:work_studio/app/partials/tools/please_wait_indicator.dart';
 import 'package:work_studio/app/partials/tools/social_auth_button.dart';
@@ -46,6 +43,8 @@ class _LoginPageState extends State<LoginPage> {
   bool isProcessSocialLogin = false;
 
   LoginService loginService = LoginService();
+
+  String _tempAccessToken = "";
 
   @override
   void initState() {
@@ -306,14 +305,14 @@ class _LoginPageState extends State<LoginPage> {
 
       if (responseModal.status == "success") {
         setState(() => isPhoneNumberSent = true);
+        setState(() {
+          _tempAccessToken = responseModal.data.accessToken;
+        });
       } else {
         setState(() => isPhoneNumberSent = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(responseModal.message),
+        showSnackBar(
             backgroundColor: const Color.fromARGB(255, 239, 40, 26),
-          ),
-        );
+            message: responseModal.message);
       }
     }
   }
@@ -321,16 +320,31 @@ class _LoginPageState extends State<LoginPage> {
   //---------------------------------------------------------------------------------
   void submitFormWithPhoneLogin() async {
     if (_phoneOTPFormKey.currentState!.validate() &&
-        _phoneOTPFormKey.currentState != null) {
-      LoginDataModal loginDataModal = createMobileLoginPayload(phoneOTP.text);
-      Map mappedUsersDetails = loginDataModal.toMap();
-      String rawJson = jsonEncode(mappedUsersDetails);
-      List<int> bytes = utf8.encode(rawJson);
-      final base64String = base64.encode(bytes);
+        _phoneOTPFormKey.currentState != null &&
+        _tempAccessToken != "") {
+      //
+      VerifyOtpResponseModal verifyOtpResponseModal = await loginService
+          .verifyOTPFromServer(phoneOTP.text, _tempAccessToken);
 
-      //   String mainURL = getDevelopmentURL(base64String, idToken, accessToken);
+      log(verifyOtpResponseModal.status);
 
-      //   navigateToWebViewPage(mainURL);
+      if (verifyOtpResponseModal.status == "success") {
+        _phoneNumberFormKey.currentState?.reset();
+        _phoneOTPFormKey.currentState?.reset();
+        tapOnWholeScreen(context);
+
+        String mainURL = getDevelopmentURL(
+            "not-found", "not-found", verifyOtpResponseModal.data.accessToken);
+        navigateToWebViewPage(mainURL);
+      } else {
+        showSnackBar(
+            backgroundColor: const Color.fromARGB(255, 239, 40, 26),
+            message: 'Something went wrong. Please try again !!!');
+      }
+    } else {
+      showSnackBar(
+          backgroundColor: const Color.fromARGB(255, 239, 40, 26),
+          message: 'Something went wrong. Please try again !!!');
     }
   }
 
@@ -349,7 +363,7 @@ class _LoginPageState extends State<LoginPage> {
     final SharedPreferences prefs = await _sharedPreferences;
     //
     String? idToken = prefs.getString('idToken') ?? "";
-    String? accessToken = prefs.getString('accessToken') ?? "";
+    // String? accessToken = prefs.getString('accessToken') ?? "";
     //
     LoginDataModal loginDataModal = createGoogleLoginPayload(userInfo);
 
@@ -358,7 +372,6 @@ class _LoginPageState extends State<LoginPage> {
     List<int> bytes = utf8.encode(rawJson);
     final base64String = base64.encode(bytes);
 
-    // String mainURL = getDevelopmentURL(base64String, idToken, accessToken);
     String mainURL = getDevelopmentURL(base64String, idToken, "not-found");
 
     log(mainURL);
@@ -411,6 +424,18 @@ class _LoginPageState extends State<LoginPage> {
         child: WebViewHomepage(mainURL: mainURL),
         type: PageTransitionType.rightToLeft,
         duration: const Duration(milliseconds: 300),
+      ),
+    );
+  }
+
+  //---------------------------------------------------------------------------------
+  void showSnackBar({required String message, required Color backgroundColor}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Container(
+            padding: const EdgeInsets.symmetric(vertical: 5),
+            child: Text(message)),
+        backgroundColor: backgroundColor,
       ),
     );
   }

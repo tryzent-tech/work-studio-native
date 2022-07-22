@@ -3,11 +3,12 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:work_studio/app/modals/otp_response_modal.dart';
+import 'package:work_studio/app/modals/otp_verify_modal.dart';
 import 'package:work_studio/app/modals/send_otp_modal.dart';
 
 class LoginService {
-  String developmentURL = 'https://network-auth.tryzent.com/auth/user';
-  String productionURL = 'https://auth.workstudio.io/auth/user';
+  String developmentURL = 'https://network-auth.tryzent.com/auth/';
+  String productionURL = 'https://auth.workstudio.io/auth/';
 
 //---------------------------------------------------------------------------------
   Future<OtpResponseModal> getOTPFromServer(String mobileNumber) async {
@@ -17,7 +18,7 @@ class LoginService {
 
       var body = json.encode(sendOtpModal.toJson());
 
-      var response = await http.post(Uri.parse(developmentURL),
+      var response = await http.post(Uri.parse(developmentURL + "user"),
           headers: {"Content-Type": "application/json"}, body: body);
 
       if (response.statusCode == 200) {
@@ -41,28 +42,37 @@ class LoginService {
   }
 
 //---------------------------------------------------------------------------------
-  Future<OtpResponseModal> verifyOTPFromServer(
+  Future<VerifyOtpResponseModal> verifyOTPFromServer(
       String otp, String accessToken) async {
-    Map _tempOTPPayload = {"otp": otp};
+    try {
+      Map _tempOTPPayload = {"otp": otp};
 
-    var body = json.encode(_tempOTPPayload);
-
-    var response = await http.post(Uri.parse(developmentURL),
-        headers: {
-          "Content-Type": "application/json",
-          "access-token": accessToken
-        },
-        body: body);
-
-    if (response.statusCode == 200) {
-      return otpResponseModalFromJson(response.body);
-    } else {
-      Data data = Data(accessToken: '');
-      OtpResponseModal otpResponseModal = OtpResponseModal(
-          data: data,
-          message: 'Something went wrong please try again !!!',
-          status: '500');
-      return otpResponseModal;
+      var body = json.encode(_tempOTPPayload);
+      var response = await http.post(Uri.parse(developmentURL + "verify-otp"),
+          headers: {
+            "Content-Type": "application/json",
+            "access-token": accessToken
+          },
+          body: body);
+      if (response.statusCode == 200) {
+        return verifyOtpResponseModalFromJson(response.body);
+      } else {
+        return verifyOTPErrorObject();
+      }
+    } catch (e) {
+      return verifyOTPErrorObject();
     }
   }
+
+//---------------------------------------------------------------------------------
+  VerifyOtpResponseModal verifyOTPErrorObject() {
+    VerifyOTPData verifyOTPData =
+        VerifyOTPData(accessToken: '', userId: '', username: '');
+    VerifyOtpResponseModal verifyOtpResponseModal = VerifyOtpResponseModal(
+        data: verifyOTPData,
+        message: 'Something went wrong. Please try again !!!',
+        status: '500');
+    return verifyOtpResponseModal;
+  }
+  //---------------------------------------------------------------------------------
 }
