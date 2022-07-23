@@ -396,10 +396,6 @@ class _LoginPageState extends State<LoginPage> {
       FacebookAuth.instance
           .login(permissions: ["public_profile", "email"]).then((value) {
         FacebookAuth.instance.getUserData().then((userInfo) async {
-          setState(() {
-            isProcessSocialLogin = false;
-          });
-
           AccessToken? accessToken = await FacebookAuth.instance.accessToken;
           LoginDataModal loginDataModal = createFacebookLoginPayload(userInfo);
 
@@ -415,6 +411,10 @@ class _LoginPageState extends State<LoginPage> {
               getDevelopmentURL(base64String, "not-found", accessToken!.token);
 
           log(mainURL);
+
+          setState(() {
+            isProcessSocialLogin = false;
+          });
 
           navigateToWebViewPage(mainURL);
         });

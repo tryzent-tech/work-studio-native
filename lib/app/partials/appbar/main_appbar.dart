@@ -3,9 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:work_studio/app/helpers/webview_navigation_control.dart';
-
-import '../../helpers/webview_helper.dart';
 
 class MainAppbar extends StatefulWidget {
   final Completer<WebViewController> webViewController;
@@ -25,7 +22,7 @@ class _MainAppbarState extends State<MainAppbar> {
   Widget build(BuildContext context) {
     return AppBar(
       leading: Container(
-        padding: const EdgeInsets.only(left: 20),
+        padding: const EdgeInsets.only(left: 5),
         child: const Icon(
           FontAwesomeIcons.infinity,
           color: Colors.white,
@@ -37,21 +34,17 @@ class _MainAppbarState extends State<MainAppbar> {
           fontSize: 20,
         ),
       ),
-      leadingWidth: 40,
+      leadingWidth: 25,
       elevation: 0.0,
       shadowColor: Colors.white,
       backgroundColor: Colors.indigo,
       foregroundColor: Colors.amber,
-      toolbarHeight: 60,
+      toolbarHeight: 40,
       titleSpacing: 20,
       titleTextStyle: const TextStyle(
         color: Colors.white,
         fontWeight: FontWeight.bold,
       ),
-      actions: <Widget>[
-        NavigationControls(widget.webViewController.future),
-        SampleMenu(widget.webViewController.future, widget.cookieManager),
-      ],
     );
   }
 }

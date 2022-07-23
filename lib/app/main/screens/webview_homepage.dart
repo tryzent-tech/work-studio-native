@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:work_studio/app/login/login.dart';
 import 'package:work_studio/app/partials/appbar/main_appbar.dart';
+import 'package:work_studio/app/partials/footerbar/bottom_navigationbar.dart';
 
 class WebViewHomepage extends StatefulWidget {
   final String mainURL;
@@ -36,7 +37,7 @@ class _WebViewHomepageState extends State<WebViewHomepage> {
     return Scaffold(
       backgroundColor: const Color.fromARGB(1, 237, 242, 246),
       appBar: PreferredSize(
-        preferredSize: const Size(60, 60),
+        preferredSize: const Size(60, 40),
         child: MainAppbar(
           webViewController: _controller,
         ),
@@ -71,6 +72,9 @@ class _WebViewHomepageState extends State<WebViewHomepage> {
         gestureNavigationEnabled: true,
         backgroundColor: const Color(0x00000000),
       ),
+      // bottomNavigationBar: BotttomNavigationBar(
+      //   webViewController: _controller,
+      // ),
     );
   }
 

@@ -14,58 +14,87 @@ class NavigationControls extends StatelessWidget {
   Widget build(BuildContext context) {
     return FutureBuilder<WebViewController>(
       future: _webViewControllerFuture,
-      builder:
-          (BuildContext context, AsyncSnapshot<WebViewController> snapshot) {
+      builder: (
+        BuildContext context,
+        AsyncSnapshot<WebViewController> snapshot,
+      ) {
         final bool webViewReady =
             snapshot.connectionState == ConnectionState.done;
         final WebViewController? controller = snapshot.data;
         return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            IconButton(
-              icon: const Icon(
-                Icons.arrow_back_ios,
-                color: Colors.white,
-              ),
-              onPressed: !webViewReady
-                  ? null
-                  : () async {
-                      if (await controller!.canGoBack()) {
-                        await controller.goBack();
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('No back history item')),
-                        );
-                        return;
-                      }
-                    },
-            ),
-            IconButton(
-              icon: const Icon(Icons.arrow_forward_ios, color: Colors.white),
-              onPressed: !webViewReady
-                  ? null
-                  : () async {
-                      if (await controller!.canGoForward()) {
-                        await controller.goForward();
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('No forward history item')),
-                        );
-                        return;
-                      }
-                    },
-            ),
-            IconButton(
-              icon: const Icon(Icons.replay, color: Colors.white),
-              onPressed: !webViewReady
-                  ? null
-                  : () {
-                      controller!.reload();
-                    },
-            ),
+            navigationBackButton(webViewReady, controller, context),
+            pageRefreshButton(webViewReady, controller),
+            navigationForwardButton(webViewReady, controller, context),
           ],
         );
       },
     );
   }
+
+//---------------------------------------------------------------------------------
+  navigationBackButton(
+    bool webViewReady,
+    WebViewController? controller,
+    BuildContext context,
+  ) {
+    return IconButton(
+      icon: const Icon(
+        Icons.arrow_back,
+        color: Colors.white,
+      ),
+      onPressed: !webViewReady
+          ? null
+          : () async {
+              if (await controller!.canGoBack()) {
+                await controller.goBack();
+              } else {
+                showSnackBar(context, "No back history item");
+                return;
+              }
+            },
+    );
+  }
+
+//---------------------------------------------------------------------------------
+  IconButton pageRefreshButton(
+      bool webViewReady, WebViewController? controller) {
+    return IconButton(
+      icon: const Icon(Icons.replay, color: Colors.white),
+      onPressed: !webViewReady
+          ? null
+          : () {
+              controller!.reload();
+            },
+    );
+  }
+
+  //---------------------------------------------------------------------------------
+  navigationForwardButton(
+      bool webViewReady, WebViewController? controller, BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.arrow_forward, color: Colors.white),
+      onPressed: !webViewReady
+          ? null
+          : () async {
+              if (await controller!.canGoForward()) {
+                await controller.goForward();
+              } else {
+                showSnackBar(context, "No forward history item");
+                return;
+              }
+            },
+    );
+  }
+
+  void showSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red.shade900,
+      ),
+    );
+  }
+  //---------------------------------------------------------------------------------
 }
