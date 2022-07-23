@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:work_studio/app/main/screens/homepage.dart';
 import 'package:work_studio/app/partials/tools/delete_popup_box.dart';
+import 'package:work_studio/app/storage/variables.dart';
 
 class LayoutPage extends StatefulWidget {
   const LayoutPage({
@@ -17,9 +18,7 @@ class _LayoutPageState extends State<LayoutPage> {
       child: GestureDetector(
         child: Scaffold(
           body: Builder(builder: (context) {
-            return const Homepage(
-              mainURL: 'https://network.tryzent.com/',
-            );
+            return Homepage(mainURL: mainApplicationURL);
           }),
         ),
         onTap: () {

@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:work_studio/app/login/login.dart';
 import 'package:work_studio/app/partials/appbar/main_appbar.dart';
+import 'package:work_studio/app/storage/variables.dart';
 
 class Homepage extends StatefulWidget {
   final String mainURL;
@@ -43,7 +44,6 @@ class _HomepageState extends State<Homepage> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () => _goBack(context),
       child: Scaffold(
         backgroundColor: const Color.fromARGB(1, 237, 242, 246),
         appBar: PreferredSize(
@@ -63,44 +63,39 @@ class _HomepageState extends State<Homepage> {
             _controller.complete(webViewController);
           },
           onProgress: (int progress) {
-            print('WebView is loading (progress : $progress%)');
+            log(progress.toString());
           },
           javascriptChannels: <JavascriptChannel>{
             _toasterJavascriptChannel(context),
           },
           navigationDelegate: (NavigationRequest request) {
-            if (request.url.startsWith('https://www.youtube.com/')) {
-              print('blocking navigation to $request}');
+            if (request.url.startsWith(mainApplicationURL + "/login")) {
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const LoginPage()),
+                  (Route<dynamic> route) => false);
               return NavigationDecision.prevent;
             }
-            print('allowing navigation to $request');
+            log(request.toString());
             return NavigationDecision.navigate;
           },
           onPageStarted: (String url) {
-            log('Page started loading: $url');
-            navigateLoginScreenIfOpenWebpageLoginpage(url, context);
+            log(url.toString());
+            navigateToNativeLogin(url, context);
           },
           onPageFinished: (String url) {
-            Future.delayed(const Duration(seconds: 5), () {
-              setState(() {
-                getCurrentURL();
-              });
-            });
-            log('Page finished loading: $url');
+            getCurrentURL();
+            log(url.toString());
           },
           gestureNavigationEnabled: true,
           backgroundColor: const Color(0x00000000),
         ),
-        // bottomNavigationBar: BotttomNavigationBar(
-        //   webViewController: _controller,
-        // ),
       ),
+      onWillPop: () => _goBack(context),
     );
   }
 
 //---------------------------------------------------------------------------------
-  void navigateLoginScreenIfOpenWebpageLoginpage(
-      String url, BuildContext context) {
+  void navigateToNativeLogin(String url, BuildContext context) {
     if (url == "https://network.tryzent.com/login" ||
         url == "http://workstudio.io/login") {
       Navigator.of(context).pushAndRemoveUntil(
@@ -109,6 +104,7 @@ class _HomepageState extends State<Homepage> {
     }
   }
 
+//---------------------------------------------------------------------------------
   Widget favoriteButton() {
     return FutureBuilder<WebViewController>(
         future: _controller.future,
@@ -135,6 +131,7 @@ class _HomepageState extends State<Homepage> {
         });
   }
 
+//---------------------------------------------------------------------------------
   JavascriptChannel _toasterJavascriptChannel(BuildContext context) {
     return JavascriptChannel(
         name: 'Toaster',
@@ -152,4 +149,5 @@ class _HomepageState extends State<Homepage> {
       return Future.value(true);
     }
   }
+  //---------------------------------------------------------------------------------
 }

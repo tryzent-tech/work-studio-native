@@ -18,7 +18,7 @@ buildDeleteDialogBox({
           child: Center(
             child: Card(
               child: SizedBox(
-                height: 220,
+                height: 200,
                 width: screenSize.width,
                 child: SingleChildScrollView(
                     child: Column(
