@@ -5,6 +5,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:work_studio/app/login/login.dart';
 import 'package:work_studio/app/partials/appbar/main_appbar.dart';
@@ -26,6 +27,9 @@ class _HomepageState extends State<Homepage> {
 
   final Completer<WebViewController> _controller =
       Completer<WebViewController>();
+
+  final Future<SharedPreferences> _sharedPreferences =
+      SharedPreferences.getInstance();
 
   @override
   void initState() {
@@ -84,6 +88,7 @@ class _HomepageState extends State<Homepage> {
           },
           onPageFinished: (String url) {
             getCurrentURL();
+            setLoginStatus();
             log(url.toString());
           },
           gestureNavigationEnabled: true,
@@ -148,6 +153,12 @@ class _HomepageState extends State<Homepage> {
     } else {
       return Future.value(true);
     }
+  }
+
+//---------------------------------------------------------------------------------
+  void setLoginStatus() async {
+    final SharedPreferences _preferences = await _sharedPreferences;
+    _preferences.setBool("isLoggedIn", true);
   }
   //---------------------------------------------------------------------------------
 }

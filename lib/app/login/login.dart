@@ -14,8 +14,10 @@ import 'package:work_studio/app/helpers/url_helper.dart';
 import 'package:work_studio/app/main/screens/homepage.dart';
 import 'package:work_studio/app/modals/otp_response_modal.dart';
 import 'package:work_studio/app/modals/otp_verify_modal.dart';
+import 'package:work_studio/app/partials/appbar/main_appbar.dart';
 import 'package:work_studio/app/partials/tools/native_action_button.dart';
 import 'package:work_studio/app/partials/tools/please_wait_indicator.dart';
+import 'package:work_studio/app/partials/tools/snackbar.dart';
 import 'package:work_studio/app/partials/tools/social_auth_button.dart';
 import 'package:work_studio/app/partials/tools/text_form_field.dart';
 import 'package:work_studio/app/provider/google_signin_provider.dart';
@@ -56,7 +58,7 @@ class _LoginPageState extends State<LoginPage> {
     var screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
-      appBar: buildAppBar(),
+      appBar: buildAppBar2(),
       backgroundColor: Colors.white,
       body: GestureDetector(
         child: SingleChildScrollView(
@@ -268,25 +270,6 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-//---------------------------------------------------------------------------------
-  AppBar buildAppBar() {
-    return AppBar(
-      title: Container(
-        child: const Image(
-          image: AssetImage(
-            "assets/images/ws-long-logo.png",
-          ),
-        ),
-        padding: const EdgeInsets.symmetric(vertical: 20),
-      ),
-      backgroundColor: const Color.fromARGB(255, 245, 245, 245),
-      elevation: 20,
-      centerTitle: true,
-      shadowColor: Colors.transparent,
-      toolbarHeight: 60,
-    );
-  }
-
   //---------------------------------------------------------------------------------
   void tapOnWholeScreen(BuildContext context) {
     final FocusScopeNode currentScope = FocusScope.of(context);
@@ -312,7 +295,8 @@ class _LoginPageState extends State<LoginPage> {
         setState(() => isPhoneNumberSent = false);
         showSnackBar(
             backgroundColor: const Color.fromARGB(255, 239, 40, 26),
-            message: responseModal.message);
+            message: responseModal.message,
+            context: context);
       }
     }
   }
@@ -347,12 +331,14 @@ class _LoginPageState extends State<LoginPage> {
       } else {
         showSnackBar(
             backgroundColor: const Color.fromARGB(255, 239, 40, 26),
-            message: 'Something went wrong. Please try again !!!');
+            message: 'Something went wrong. Please try again !!!',
+            context: context);
       }
     } else {
       showSnackBar(
           backgroundColor: const Color.fromARGB(255, 239, 40, 26),
-          message: 'Something went wrong. Please try again !!!');
+          message: 'Something went wrong. Please try again !!!',
+          context: context);
     }
   }
 
@@ -371,7 +357,7 @@ class _LoginPageState extends State<LoginPage> {
     final SharedPreferences prefs = await _sharedPreferences;
     //
     String? idToken = prefs.getString('idToken') ?? "";
-    // String? accessToken = prefs.getString('accessToken') ?? "";
+    String? accessToken = prefs.getString('accessToken') ?? "";
     //
     LoginDataModal loginDataModal = createGoogleLoginPayload(userInfo);
 
@@ -382,7 +368,7 @@ class _LoginPageState extends State<LoginPage> {
 
     String mainURL = getDevelopmentURL(base64String, idToken, "not-found");
 
-    // log(mainURL);
+    log(mainURL);
 
     navigateToWebViewPage(mainURL);
   }
@@ -410,7 +396,7 @@ class _LoginPageState extends State<LoginPage> {
           String mainURL =
               getDevelopmentURL(base64String, "not-found", accessToken!.token);
 
-          // log(mainURL);
+          log(mainURL);
 
           setState(() {
             isProcessSocialLogin = false;
@@ -432,18 +418,6 @@ class _LoginPageState extends State<LoginPage> {
         child: Homepage(mainURL: mainURL),
         type: PageTransitionType.rightToLeft,
         duration: const Duration(milliseconds: 300),
-      ),
-    );
-  }
-
-  //---------------------------------------------------------------------------------
-  void showSnackBar({required String message, required Color backgroundColor}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Container(
-            padding: const EdgeInsets.symmetric(vertical: 5),
-            child: Text(message)),
-        backgroundColor: backgroundColor,
       ),
     );
   }

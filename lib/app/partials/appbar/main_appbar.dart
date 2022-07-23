@@ -48,3 +48,57 @@ class _MainAppbarState extends State<MainAppbar> {
     );
   }
 }
+
+//---------------------------------------------------------------------------------
+AppBar buildAppBar1() {
+  return AppBar(
+    title: Container(
+      child: const Image(
+        image: AssetImage(
+          "assets/images/ws-long-logo.png",
+        ),
+      ),
+      padding: const EdgeInsets.symmetric(vertical: 20),
+    ),
+    backgroundColor: const Color.fromARGB(255, 245, 245, 245),
+    elevation: 20,
+    centerTitle: true,
+    shadowColor: Colors.transparent,
+    toolbarHeight: 60,
+  );
+}
+
+//---------------------------------------------------------------------------------
+AppBar buildAppBar2() {
+  return AppBar(
+    title: Container(
+      padding: const EdgeInsets.all(0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            child: const Icon(
+              FontAwesomeIcons.infinity,
+              color: Colors.white,
+            ),
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+          ),
+          const Text(
+            "Work Studio",
+            style: TextStyle(fontSize: 20),
+          ),
+        ],
+      ),
+    ),
+    elevation: 20,
+    centerTitle: true,
+    shadowColor: Colors.white,
+    backgroundColor: Colors.indigo,
+    foregroundColor: Colors.amber,
+    toolbarHeight: 55,
+    titleTextStyle: const TextStyle(
+      color: Colors.white,
+      fontWeight: FontWeight.bold,
+    ),
+  );
+}

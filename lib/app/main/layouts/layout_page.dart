@@ -1,4 +1,8 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:work_studio/app/login/login.dart';
 import 'package:work_studio/app/main/screens/homepage.dart';
 import 'package:work_studio/app/partials/tools/delete_popup_box.dart';
 import 'package:work_studio/app/storage/variables.dart';
@@ -12,13 +16,35 @@ class LayoutPage extends StatefulWidget {
 }
 
 class _LayoutPageState extends State<LayoutPage> {
+  final Future<SharedPreferences> _sharedPreferences =
+      SharedPreferences.getInstance();
+
+  @override
+  void initState() {
+    // getLoggedInData();
+    super.initState();
+  }
+
+  void getLoggedInData() async {
+    final SharedPreferences _preferences = await _sharedPreferences;
+    var isUserLoggedIn = _preferences.getBool("isLoggedIn");
+    if (isUserLoggedIn == true) {
+      Navigator.push(context, MaterialPageRoute<void>(
+        builder: (BuildContext context) {
+          return Homepage(mainURL: mainApplicationURL);
+        },
+      ));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       child: GestureDetector(
         child: Scaffold(
+          backgroundColor: const Color.fromARGB(1, 237, 242, 246),
           body: Builder(builder: (context) {
-            return Homepage(mainURL: mainApplicationURL);
+            return const LoginPage();
           }),
         ),
         onTap: () {
