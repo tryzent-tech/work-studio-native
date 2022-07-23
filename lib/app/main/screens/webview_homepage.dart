@@ -40,7 +40,7 @@ class _WebViewHomepageState extends State<WebViewHomepage> {
       child: Scaffold(
         backgroundColor: const Color.fromARGB(1, 237, 242, 246),
         appBar: PreferredSize(
-          preferredSize: const Size(60, 40),
+          preferredSize: const Size(60, 0),
           child: MainAppbar(
             webViewController: _controller,
           ),

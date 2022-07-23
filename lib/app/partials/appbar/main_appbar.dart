@@ -39,7 +39,7 @@ class _MainAppbarState extends State<MainAppbar> {
       shadowColor: Colors.white,
       backgroundColor: Colors.indigo,
       foregroundColor: Colors.amber,
-      toolbarHeight: 40,
+      toolbarHeight: 60,
       titleSpacing: 20,
       titleTextStyle: const TextStyle(
         color: Colors.white,
