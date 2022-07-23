@@ -39,12 +39,6 @@ class _HomepageState extends State<Homepage> {
     }
   }
 
-  void getCurrentURL() async {
-    _webViewController.goBack();
-    var url = await _webViewController.currentUrl();
-    log(url.toString());
-  }
-
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -74,9 +68,7 @@ class _HomepageState extends State<Homepage> {
           },
           navigationDelegate: (NavigationRequest request) {
             if (request.url.startsWith(mainApplicationURL + "/login")) {
-              Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => const LoginPage()),
-                  (Route<dynamic> route) => false);
+              goToLoginpage(context);
               return NavigationDecision.prevent;
             }
             log(request.toString());
@@ -87,16 +79,25 @@ class _HomepageState extends State<Homepage> {
             navigateToNativeLogin(url, context);
           },
           onPageFinished: (String url) {
-            getCurrentURL();
             setLoginStatus();
             log(url.toString());
           },
           gestureNavigationEnabled: true,
           backgroundColor: const Color(0x00000000),
         ),
+        // bottomNavigationBar: BotttomNavigationBar(
+        //   webViewController: _controller,
+        // ),
       ),
       onWillPop: () => _goBack(context),
     );
+  }
+
+//---------------------------------------------------------------------------------
+  void goToLoginpage(BuildContext context) {
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+        (Route<dynamic> route) => false);
   }
 
 //---------------------------------------------------------------------------------
@@ -157,8 +158,15 @@ class _HomepageState extends State<Homepage> {
 
 //---------------------------------------------------------------------------------
   void setLoginStatus() async {
+    getCurrentURL();
     final SharedPreferences _preferences = await _sharedPreferences;
     _preferences.setBool("isLoggedIn", true);
+  }
+
+  void getCurrentURL() async {
+    _webViewController.goBack();
+    var url = await _webViewController.currentUrl();
+    log(url.toString());
   }
   //---------------------------------------------------------------------------------
 }
