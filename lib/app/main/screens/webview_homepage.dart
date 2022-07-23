@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:work_studio/app/login/login.dart';
 import 'package:work_studio/app/partials/appbar/main_appbar.dart';
-import 'package:work_studio/app/partials/footerbar/bottom_navigationbar.dart';
 
 class WebViewHomepage extends StatefulWidget {
   final String mainURL;
@@ -21,6 +20,8 @@ class WebViewHomepage extends StatefulWidget {
 }
 
 class _WebViewHomepageState extends State<WebViewHomepage> {
+  late final WebViewController _webViewController;
+
   final Completer<WebViewController> _controller =
       Completer<WebViewController>();
 
@@ -34,47 +35,54 @@ class _WebViewHomepageState extends State<WebViewHomepage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color.fromARGB(1, 237, 242, 246),
-      appBar: PreferredSize(
-        preferredSize: const Size(60, 40),
-        child: MainAppbar(
-          webViewController: _controller,
+    return WillPopScope(
+      onWillPop: () => _goBack(context),
+      child: Scaffold(
+        backgroundColor: const Color.fromARGB(1, 237, 242, 246),
+        appBar: PreferredSize(
+          preferredSize: const Size(60, 40),
+          child: MainAppbar(
+            webViewController: _controller,
+          ),
         ),
+        body: WebView(
+          initialUrl: widget.mainURL,
+          javascriptMode: JavascriptMode.unrestricted,
+          onWebViewCreated: (WebViewController webViewController) {
+            _controller.future.then(
+              (value) => _webViewController = value,
+            );
+
+            _controller.complete(webViewController);
+          },
+          onProgress: (int progress) {
+            print('WebView is loading (progress : $progress%)');
+          },
+          javascriptChannels: <JavascriptChannel>{
+            _toasterJavascriptChannel(context),
+          },
+          navigationDelegate: (NavigationRequest request) {
+            if (request.url.startsWith('https://www.youtube.com/')) {
+              print('blocking navigation to $request}');
+              return NavigationDecision.prevent;
+            }
+            print('allowing navigation to $request');
+            return NavigationDecision.navigate;
+          },
+          onPageStarted: (String url) {
+            navigateLoginScreenIfOpenWebpageLoginpage(url, context);
+            print('Page started loading: $url');
+          },
+          onPageFinished: (String url) {
+            print('Page finished loading: $url');
+          },
+          gestureNavigationEnabled: true,
+          backgroundColor: const Color(0x00000000),
+        ),
+        // bottomNavigationBar: BotttomNavigationBar(
+        //   webViewController: _controller,
+        // ),
       ),
-      body: WebView(
-        initialUrl: widget.mainURL,
-        javascriptMode: JavascriptMode.unrestricted,
-        onWebViewCreated: (WebViewController webViewController) {
-          _controller.complete(webViewController);
-        },
-        onProgress: (int progress) {
-          print('WebView is loading (progress : $progress%)');
-        },
-        javascriptChannels: <JavascriptChannel>{
-          _toasterJavascriptChannel(context),
-        },
-        navigationDelegate: (NavigationRequest request) {
-          if (request.url.startsWith('https://www.youtube.com/')) {
-            print('blocking navigation to $request}');
-            return NavigationDecision.prevent;
-          }
-          print('allowing navigation to $request');
-          return NavigationDecision.navigate;
-        },
-        onPageStarted: (String url) {
-          navigateLoginScreenIfOpenWebpageLoginpage(url, context);
-          print('Page started loading: $url');
-        },
-        onPageFinished: (String url) {
-          print('Page finished loading: $url');
-        },
-        gestureNavigationEnabled: true,
-        backgroundColor: const Color(0x00000000),
-      ),
-      // bottomNavigationBar: BotttomNavigationBar(
-      //   webViewController: _controller,
-      // ),
     );
   }
 
@@ -123,5 +131,14 @@ class _WebViewHomepageState extends State<WebViewHomepage> {
             SnackBar(content: Text(message.message)),
           );
         });
+  }
+
+  Future<bool> _goBack(BuildContext context) async {
+    if (await _webViewController.canGoBack()) {
+      _webViewController.goBack();
+      return Future.value(false);
+    } else {
+      return Future.value(true);
+    }
   }
 }

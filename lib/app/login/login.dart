@@ -382,7 +382,7 @@ class _LoginPageState extends State<LoginPage> {
 
     String mainURL = getDevelopmentURL(base64String, idToken, "not-found");
 
-    log(mainURL);
+    // log(mainURL);
 
     navigateToWebViewPage(mainURL);
   }
@@ -410,7 +410,7 @@ class _LoginPageState extends State<LoginPage> {
           String mainURL =
               getDevelopmentURL(base64String, "not-found", accessToken!.token);
 
-          log(mainURL);
+          // log(mainURL);
 
           setState(() {
             isProcessSocialLogin = false;
