@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, avoid_print, unused_element
 
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -8,18 +9,18 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:work_studio/app/login/login.dart';
 import 'package:work_studio/app/partials/appbar/main_appbar.dart';
 
-class WebViewHomepage extends StatefulWidget {
+class Homepage extends StatefulWidget {
   final String mainURL;
-  const WebViewHomepage({Key? key, this.cookieManager, required this.mainURL})
+  const Homepage({Key? key, this.cookieManager, required this.mainURL})
       : super(key: key);
 
   final CookieManager? cookieManager;
 
   @override
-  State<WebViewHomepage> createState() => _WebViewHomepageState();
+  State<Homepage> createState() => _HomepageState();
 }
 
-class _WebViewHomepageState extends State<WebViewHomepage> {
+class _HomepageState extends State<Homepage> {
   late final WebViewController _webViewController;
 
   final Completer<WebViewController> _controller =
@@ -31,6 +32,12 @@ class _WebViewHomepageState extends State<WebViewHomepage> {
     if (Platform.isAndroid) {
       WebView.platform = SurfaceAndroidWebView();
     }
+  }
+
+  void getCurrentURL() async {
+    _webViewController.goBack();
+    var url = await _webViewController.currentUrl();
+    log(url.toString());
   }
 
   @override
@@ -70,11 +77,16 @@ class _WebViewHomepageState extends State<WebViewHomepage> {
             return NavigationDecision.navigate;
           },
           onPageStarted: (String url) {
+            log('Page started loading: $url');
             navigateLoginScreenIfOpenWebpageLoginpage(url, context);
-            print('Page started loading: $url');
           },
           onPageFinished: (String url) {
-            print('Page finished loading: $url');
+            Future.delayed(const Duration(seconds: 5), () {
+              setState(() {
+                getCurrentURL();
+              });
+            });
+            log('Page finished loading: $url');
           },
           gestureNavigationEnabled: true,
           backgroundColor: const Color(0x00000000),
@@ -135,7 +147,6 @@ class _WebViewHomepageState extends State<WebViewHomepage> {
 
   Future<bool> _goBack(BuildContext context) async {
     if (await _webViewController.canGoBack()) {
-      _webViewController.goBack();
       return Future.value(false);
     } else {
       return Future.value(true);

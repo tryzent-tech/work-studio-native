@@ -8,7 +8,6 @@ import 'package:provider/provider.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:work_studio/app/main/screens/facebook_user_profile.dart';
 import 'package:work_studio/app/provider/google_signin_provider.dart';
 
 class GoogleFacebookSignInPage extends StatefulWidget {
@@ -30,17 +29,8 @@ class _GoogleFacebookSignInPageState extends State<GoogleFacebookSignInPage> {
   @override
   void initState() {
     log(_userDetails.toString());
-    isLoggedInUser();
-    super.initState();
-  }
 
-  isLoggedInUser() {
-    _sharedPreferences.then((SharedPreferences prefs) {
-      bool? _userIsLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-      if (_userIsLoggedIn) {
-        pageNavigation(childWidget: const FacebookUserProfile());
-      }
-    });
+    super.initState();
   }
 
   void pageNavigation({required Widget childWidget}) {
@@ -190,7 +180,6 @@ class _GoogleFacebookSignInPageState extends State<GoogleFacebookSignInPage> {
     _preferences.setString("email", _userDetails['email']);
     _preferences.setString(
         "profileImage", _userDetails['picture']['data']['url']);
-    isLoggedInUser();
   }
 
 //---------------------------------------------------------------------------------

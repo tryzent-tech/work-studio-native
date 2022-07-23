@@ -11,7 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:work_studio/app/helpers/login_data_modal.dart';
 import 'package:work_studio/app/helpers/login_object_helper.dart';
 import 'package:work_studio/app/helpers/url_helper.dart';
-import 'package:work_studio/app/main/screens/webview_homepage.dart';
+import 'package:work_studio/app/main/screens/homepage.dart';
 import 'package:work_studio/app/modals/otp_response_modal.dart';
 import 'package:work_studio/app/modals/otp_verify_modal.dart';
 import 'package:work_studio/app/partials/tools/native_action_button.dart';
@@ -429,7 +429,7 @@ class _LoginPageState extends State<LoginPage> {
     Navigator.push(
       context,
       PageTransition(
-        child: WebViewHomepage(mainURL: mainURL),
+        child: Homepage(mainURL: mainURL),
         type: PageTransitionType.rightToLeft,
         duration: const Duration(milliseconds: 300),
       ),
