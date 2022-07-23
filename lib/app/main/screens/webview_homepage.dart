@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:work_studio/app/login/login.dart';
 import 'package:work_studio/app/partials/appbar/main_appbar.dart';
 
 class WebViewHomepage extends StatefulWidget {
@@ -35,7 +36,7 @@ class _WebViewHomepageState extends State<WebViewHomepage> {
     return Scaffold(
       backgroundColor: const Color.fromARGB(1, 237, 242, 246),
       appBar: PreferredSize(
-        preferredSize: const Size(60, 0),
+        preferredSize: const Size(60, 60),
         child: MainAppbar(
           webViewController: _controller,
         ),
@@ -61,6 +62,7 @@ class _WebViewHomepageState extends State<WebViewHomepage> {
           return NavigationDecision.navigate;
         },
         onPageStarted: (String url) {
+          navigateLoginScreenIfOpenWebpageLoginpage(url, context);
           print('Page started loading: $url');
         },
         onPageFinished: (String url) {
@@ -70,6 +72,17 @@ class _WebViewHomepageState extends State<WebViewHomepage> {
         backgroundColor: const Color(0x00000000),
       ),
     );
+  }
+
+//---------------------------------------------------------------------------------
+  void navigateLoginScreenIfOpenWebpageLoginpage(
+      String url, BuildContext context) {
+    if (url == "https://network.tryzent.com/login" ||
+        url == "http://workstudio.io/login") {
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const LoginPage()),
+          (Route<dynamic> route) => false);
+    }
   }
 
   Widget favoriteButton() {
