@@ -153,7 +153,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               Builder(builder: (context) {
                 if (isProcessSocialLogin) {
-                  return customProgressIndicator(screenSize);
+                  return pulseProcressbar(screenSize);
                 } else {
                   return const SizedBox.shrink();
                 }
