@@ -7,6 +7,7 @@ import 'package:work_studio/app/main/screens/homepage.dart';
 import 'package:work_studio/app/partials/tools/delete_popup_box.dart';
 import 'package:work_studio/app/partials/tools/please_wait_indicator.dart';
 import 'package:work_studio/app/storage/local_storage.dart';
+import 'package:work_studio/app/storage/variables.dart';
 
 class LayoutPage extends StatefulWidget {
   const LayoutPage({
@@ -33,8 +34,8 @@ class _LayoutPageState extends State<LayoutPage> {
     bool isLoggedIn = await _localStorage.getIsLoggedIn();
     mainApplicationURL = await _localStorage.getURL();
     //
-    log(isLoggedIn.toString());
-    log(mainApplicationURL.toString());
+    // log(isLoggedIn.toString());
+    // log(mainApplicationURL.toString());
     //
     if (isLoggedIn && mainApplicationURL != "") {
       //
@@ -50,25 +51,25 @@ class _LayoutPageState extends State<LayoutPage> {
   @override
   Widget build(BuildContext context) {
     var screenSize = MediaQuery.of(context).size;
-    const backgroundColor = Color.fromARGB(1, 237, 242, 246);
+
     //
     return WillPopScope(
       child: GestureDetector(
         child: Builder(builder: (context) {
           if (isProcessing == false && isUserLoggedIn == false) {
             return Scaffold(
-              backgroundColor: backgroundColor,
+              backgroundColor: mainBackgroundColor,
               body: Builder(builder: (context) {
                 return const LoginPage();
               }),
             );
           } else {
             return Scaffold(
-              backgroundColor: backgroundColor,
+              backgroundColor: mainBackgroundColor,
               body: Column(
                 children: [
                   Builder(builder: (context) {
-                    return pulseProcressbar(screenSize);
+                    return pulseProcressbar(screenSize, 0);
                   }),
                 ],
               ),
@@ -112,13 +113,13 @@ class _LayoutPageState extends State<LayoutPage> {
 
   //---------------------------------------------------------------------------------
   void navigateToWebViewPage(String mainURL) {
-    Navigator.push(
-      context,
+    Navigator.of(context).pushAndRemoveUntil(
       PageTransition(
         child: Homepage(mainURL: mainURL),
         type: PageTransitionType.rightToLeft,
         duration: const Duration(milliseconds: 300),
       ),
+      (Route<dynamic> route) => false,
     );
   }
 

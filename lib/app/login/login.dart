@@ -151,7 +151,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               Builder(builder: (context) {
                 if (isProcessSocialLogin) {
-                  return pulseProcressbar(screenSize);
+                  return pulseProcressbar(screenSize, 100);
                 } else {
                   return const SizedBox.shrink();
                 }
@@ -258,31 +258,19 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-//---------------------------------------------------------------------------------
-  void reloadCurrentPage() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (BuildContext context) => super.widget,
-      ),
-    );
-  }
-
-  //---------------------------------------------------------------------------------
-  void tapOnWholeScreen(BuildContext context) {
-    final FocusScopeNode currentScope = FocusScope.of(context);
-    if (!currentScope.hasPrimaryFocus && currentScope.hasFocus) {
-      FocusManager.instance.primaryFocus!.unfocus();
-    }
-  }
-
   //---------------------------------------------------------------------------------
   void sendNumberAndGetOTP() async {
     if (_phoneNumberFormKey.currentState!.validate() &&
         _phoneNumberFormKey.currentState != null) {
-//
+      //
+      setState(() => isProcessSocialLogin = true);
+      //
       OtpResponseModal responseModal =
           await loginService.getOTPFromServer(phoneNumber.text);
+
+      //
+      setState(() => isProcessSocialLogin = false);
+      //
 
       if (responseModal.status == "success") {
         setState(() => isPhoneNumberSent = true);
@@ -305,70 +293,50 @@ class _LoginPageState extends State<LoginPage> {
         _phoneOTPFormKey.currentState != null &&
         _tempAccessToken != "") {
       //
-
+      setState(() => isProcessSocialLogin = true);
+      //
       VerifyOtpResponseModal verifyOtpResponseModal = await loginService
           .verifyOTPFromServer(phoneOTP.text, _tempAccessToken);
-
-      setState(() => isPhoneNumberSent = false);
+      //
       _phoneNumberFormKey.currentState?.reset();
       _phoneOTPFormKey.currentState?.reset();
+      //
       tapOnWholeScreen(context);
 
       if (verifyOtpResponseModal.status == "success") {
         //
-        LoginDataModal loginDataModal = createMobileLoginPayload();
-
-        Map mappedUsersDetails = loginDataModal.toMap();
-        String rawJson = jsonEncode(mappedUsersDetails);
-        List<int> bytes = utf8.encode(rawJson);
-        final base64String = base64.encode(bytes);
-
-        var accessToken = verifyOtpResponseModal.data.accessToken;
-
-        String mainURL =
-            getDevelopmentURL(base64String, "not-found", accessToken);
-
-        _localStorage.setIsLoggedIn(true);
-        _localStorage.setURL(mainURL);
-
-        navigateToWebViewPage(mainURL);
+        gotoHomepageWithPhoneLogin(verifyOtpResponseModal);
         //
       } else {
         showSnackBar(
             backgroundColor: const Color.fromARGB(255, 239, 40, 26),
             message: 'Something went wrong. Please try again !!!',
             context: context);
+        setState(() => isProcessSocialLogin = false);
       }
     } else {
       showSnackBar(
           backgroundColor: const Color.fromARGB(255, 239, 40, 26),
           message: 'Something went wrong. Please try again !!!',
           context: context);
+      setState(() => isProcessSocialLogin = false);
     }
   }
 
-  //---------------------------------------------------------------------------------
-
-  void loginWithGoggle(BuildContext context) async {
-    setState(() => isProcessSocialLogin = true);
-    final provider = Provider.of<GoggleSignInProvider>(context, listen: false);
-    GoogleSignInAccount? userInfo = await provider.googleLogin();
-    setState(() => isProcessSocialLogin = false);
-    googleRedirectPage(userInfo);
-  }
-
 //---------------------------------------------------------------------------------
-  googleRedirectPage(GoogleSignInAccount? userInfo) async {
+  void gotoHomepageWithPhoneLogin(
+      VerifyOtpResponseModal verifyOtpResponseModal) {
     //
-    LoginDataModal loginDataModal = createGoogleLoginPayload(userInfo);
+    LoginDataModal loginDataModal = createMobileLoginPayload();
 
     Map mappedUsersDetails = loginDataModal.toMap();
     String rawJson = jsonEncode(mappedUsersDetails);
     List<int> bytes = utf8.encode(rawJson);
     final base64String = base64.encode(bytes);
 
-    String accessToken = await _localStorage.getGoogleAccessToken();
-    String mainURL = getDevelopmentURL(base64String, accessToken, "not-found");
+    var accessToken = verifyOtpResponseModal.data.accessToken;
+
+    String mainURL = getDevelopmentURL(base64String, "not-found", accessToken);
 
     _localStorage.setIsLoggedIn(true);
     _localStorage.setURL(mainURL);
@@ -376,39 +344,50 @@ class _LoginPageState extends State<LoginPage> {
     navigateToWebViewPage(mainURL);
   }
 
+  //---------------------------------------------------------------------------------
+
+  void loginWithGoggle(BuildContext context) async {
+    setState(() => isProcessSocialLogin = true);
+    //
+
+    final provider = Provider.of<GoggleSignInProvider>(context, listen: false);
+    GoogleSignInAccount? userInfo = await provider.googleLogin();
+
+    //
+    LoginDataModal loginDataModal = createGoogleLoginPayload(userInfo);
+
+    //
+    Map mappedUsersDetails = loginDataModal.toMap();
+    String rawJson = jsonEncode(mappedUsersDetails);
+    List<int> bytes = utf8.encode(rawJson);
+    final base64String = base64.encode(bytes);
+
+    //
+    String accessToken = await _localStorage.getGoogleAccessToken();
+    String mainURL = getDevelopmentURL(base64String, accessToken, "not-found");
+
+    //
+    _localStorage.setIsLoggedIn(true);
+    _localStorage.setURL(mainURL);
+    //
+    navigateToWebViewPage(mainURL);
+  }
+
 //---------------------------------------------------------------------------------
   void loginWithFacebook() async {
     try {
-      setState(() {
-        isProcessSocialLogin = true;
-      });
+      setState(() => isProcessSocialLogin = true);
       FacebookAuth.instance
-          .login(permissions: ["public_profile", "email"]).then((value) {
-        //
+          .login(permissions: ['email', 'public_profile']).then((value) {
         FacebookAuth.instance.getUserData().then((userInfo) async {
-          AccessToken? accessToken = await FacebookAuth.instance.accessToken;
-          LoginDataModal loginDataModal = createFacebookLoginPayload(userInfo);
-
-          Map mappedUsersDetails = loginDataModal.toMap();
-
-          log(mappedUsersDetails.toString());
-
-          String rawJson = jsonEncode(mappedUsersDetails);
-          List<int> bytes = utf8.encode(rawJson);
-          final base64String = base64.encode(bytes);
-
-          String mainURL =
-              getDevelopmentURL(base64String, "not-found", accessToken!.token);
-
-          _localStorage.setIsLoggedIn(true);
-          _localStorage.setURL(mainURL);
-
-          setState(() {
-            isProcessSocialLogin = false;
-          });
-
-          navigateToWebViewPage(mainURL);
+          //
+          await facebookLoginHelper(userInfo);
+          //
+        }).onError((error, stackTrace) {
+          setState(() => isProcessSocialLogin = false);
         });
+      }).onError((error, stackTrace) {
+        setState(() => isProcessSocialLogin = false);
       });
     } catch (e) {
       print(e.toString());
@@ -416,7 +395,30 @@ class _LoginPageState extends State<LoginPage> {
   }
 
 //---------------------------------------------------------------------------------
+  Future<void> facebookLoginHelper(Map<String, dynamic> userInfo) async {
+    //
+    AccessToken? accessToken = await FacebookAuth.instance.accessToken;
+    LoginDataModal loginDataModal = createFacebookLoginPayload(userInfo);
+
+    Map mappedUsersDetails = loginDataModal.toMap();
+
+    String rawJson = jsonEncode(mappedUsersDetails);
+    List<int> bytes = utf8.encode(rawJson);
+    final base64String = base64.encode(bytes);
+
+    String mainURL =
+        getDevelopmentURL(base64String, "not-found", accessToken!.token);
+
+    _localStorage.setIsLoggedIn(true);
+    _localStorage.setURL(mainURL);
+    //
+    navigateToWebViewPage(mainURL);
+  }
+
+//---------------------------------------------------------------------------------
   void navigateToWebViewPage(String mainURL) {
+    //
+    setState(() => isProcessSocialLogin = false);
     Navigator.push(
       context,
       PageTransition(
@@ -425,6 +427,14 @@ class _LoginPageState extends State<LoginPage> {
         duration: const Duration(milliseconds: 300),
       ),
     );
+  }
+
+  //---------------------------------------------------------------------------------
+  void tapOnWholeScreen(BuildContext context) {
+    final FocusScopeNode currentScope = FocusScope.of(context);
+    if (!currentScope.hasPrimaryFocus && currentScope.hasFocus) {
+      FocusManager.instance.primaryFocus!.unfocus();
+    }
   }
 
   //---------------------------------------------------------------------------------

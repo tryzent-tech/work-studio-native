@@ -31,14 +31,14 @@ Container customProgressIndicator(Size screenSize) {
   );
 }
 
-Container pulseProcressbar(Size screenSize) {
+Container pulseProcressbar(Size screenSize, int minusTop) {
   return Container(
     padding: const EdgeInsets.all(0),
     height: screenSize.height,
     color: Colors.white,
     child: Column(
       children: [
-        SizedBox(height: screenSize.height / 2),
+        SizedBox(height: screenSize.height / 2 - minusTop),
         SpinKitPulse(
           size: 72,
           itemBuilder: (BuildContext context, int index) {
