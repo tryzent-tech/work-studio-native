@@ -8,10 +8,13 @@ class MainAppbar extends StatefulWidget {
   final Completer<WebViewController> webViewController;
   final CookieManager? cookieManager;
 
+  final Function() logoutMethod;
+
   const MainAppbar({
     Key? key,
     required this.webViewController,
     this.cookieManager,
+    required this.logoutMethod,
   }) : super(key: key);
   @override
   _MainAppbarState createState() => _MainAppbarState();
@@ -44,6 +47,29 @@ class _MainAppbarState extends State<MainAppbar> {
       titleTextStyle: const TextStyle(
         color: Colors.white,
         fontWeight: FontWeight.bold,
+      ),
+      actions: [
+        logoutWidget(),
+      ],
+    );
+  }
+
+  Container logoutWidget() {
+    return Container(
+      padding: const EdgeInsets.all(0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          IconButton(
+            onPressed: widget.logoutMethod,
+            iconSize: 20,
+            icon: const Icon(
+              FontAwesomeIcons.powerOff,
+              color: Colors.white,
+            ),
+            splashRadius: 20,
+          ),
+        ],
       ),
     );
   }

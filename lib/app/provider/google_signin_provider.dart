@@ -1,11 +1,10 @@
 // ignore_for_file: avoid_print
 
 import 'dart:developer';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:work_studio/app/storage/local_storage.dart';
 
 class GoggleSignInProvider extends ChangeNotifier {
   final googleSignin = GoogleSignIn();
@@ -16,11 +15,6 @@ class GoggleSignInProvider extends ChangeNotifier {
 
   Future<GoogleSignInAccount?> googleLogin() async {
     try {
-      final Future<SharedPreferences> _sharedPreferences =
-          SharedPreferences.getInstance();
-
-      final SharedPreferences _preferences = await _sharedPreferences;
-
       final googleUserInfo = await googleSignin.signIn();
 
       if (googleUserInfo != null) {
@@ -38,8 +32,9 @@ class GoggleSignInProvider extends ChangeNotifier {
 
       await FirebaseAuth.instance.signInWithCredential(credential);
 
-      _preferences.setString("idToken", googleAuth.accessToken!);
-      _preferences.setString("accessToken", googleAuth.idToken!);
+      LocalStorage _localStorage = LocalStorage();
+      _localStorage.setGoogleIdToken(googleAuth.idToken!);
+      _localStorage.setGoogleAccessToken(googleAuth.accessToken!);
 
       notifyListeners();
 

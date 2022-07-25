@@ -38,7 +38,7 @@ Container pulseProcressbar(Size screenSize) {
     color: Colors.white,
     child: Column(
       children: [
-        SizedBox(height: screenSize.height / 2 - 100),
+        SizedBox(height: screenSize.height / 2),
         SpinKitPulse(
           size: 72,
           itemBuilder: (BuildContext context, int index) {

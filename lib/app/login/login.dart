@@ -7,7 +7,6 @@ import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:work_studio/app/helpers/login_data_modal.dart';
 import 'package:work_studio/app/helpers/login_object_helper.dart';
 import 'package:work_studio/app/helpers/url_helper.dart';
@@ -22,6 +21,7 @@ import 'package:work_studio/app/partials/tools/social_auth_button.dart';
 import 'package:work_studio/app/partials/tools/text_form_field.dart';
 import 'package:work_studio/app/provider/google_signin_provider.dart';
 import 'package:work_studio/app/services/login_service.dart';
+import 'package:work_studio/app/storage/local_storage.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({
@@ -32,9 +32,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final Future<SharedPreferences> _sharedPreferences =
-      SharedPreferences.getInstance();
-
   TextEditingController phoneNumber = TextEditingController();
   TextEditingController phoneOTP = TextEditingController();
 
@@ -45,6 +42,7 @@ class _LoginPageState extends State<LoginPage> {
   bool isProcessSocialLogin = false;
 
   LoginService loginService = LoginService();
+  final LocalStorage _localStorage = LocalStorage();
 
   String _tempAccessToken = "";
 
@@ -325,9 +323,16 @@ class _LoginPageState extends State<LoginPage> {
         List<int> bytes = utf8.encode(rawJson);
         final base64String = base64.encode(bytes);
 
-        String mainURL = getDevelopmentURL(
-            base64String, "not-found", verifyOtpResponseModal.data.accessToken);
+        var accessToken = verifyOtpResponseModal.data.accessToken;
+
+        String mainURL =
+            getDevelopmentURL(base64String, "not-found", accessToken);
+
+        _localStorage.setIsLoggedIn(true);
+        _localStorage.setURL(mainURL);
+
         navigateToWebViewPage(mainURL);
+        //
       } else {
         showSnackBar(
             backgroundColor: const Color.fromARGB(255, 239, 40, 26),
@@ -354,10 +359,6 @@ class _LoginPageState extends State<LoginPage> {
 
 //---------------------------------------------------------------------------------
   googleRedirectPage(GoogleSignInAccount? userInfo) async {
-    final SharedPreferences prefs = await _sharedPreferences;
-    //
-    String? idToken = prefs.getString('idToken') ?? "";
-    String? accessToken = prefs.getString('accessToken') ?? "";
     //
     LoginDataModal loginDataModal = createGoogleLoginPayload(userInfo);
 
@@ -366,9 +367,11 @@ class _LoginPageState extends State<LoginPage> {
     List<int> bytes = utf8.encode(rawJson);
     final base64String = base64.encode(bytes);
 
-    String mainURL = getDevelopmentURL(base64String, idToken, "not-found");
+    String accessToken = await _localStorage.getGoogleAccessToken();
+    String mainURL = getDevelopmentURL(base64String, accessToken, "not-found");
 
-    log(mainURL);
+    _localStorage.setIsLoggedIn(true);
+    _localStorage.setURL(mainURL);
 
     navigateToWebViewPage(mainURL);
   }
@@ -381,6 +384,7 @@ class _LoginPageState extends State<LoginPage> {
       });
       FacebookAuth.instance
           .login(permissions: ["public_profile", "email"]).then((value) {
+        //
         FacebookAuth.instance.getUserData().then((userInfo) async {
           AccessToken? accessToken = await FacebookAuth.instance.accessToken;
           LoginDataModal loginDataModal = createFacebookLoginPayload(userInfo);
@@ -396,7 +400,8 @@ class _LoginPageState extends State<LoginPage> {
           String mainURL =
               getDevelopmentURL(base64String, "not-found", accessToken!.token);
 
-          log(mainURL);
+          _localStorage.setIsLoggedIn(true);
+          _localStorage.setURL(mainURL);
 
           setState(() {
             isProcessSocialLogin = false;

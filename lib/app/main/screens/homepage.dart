@@ -1,13 +1,12 @@
 // ignore_for_file: public_member_api_docs, avoid_print, unused_element
 
 import 'dart:async';
-import 'dart:developer';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:work_studio/app/login/login.dart';
+import 'package:work_studio/app/main/layouts/layout_page.dart';
 import 'package:work_studio/app/partials/appbar/main_appbar.dart';
 import 'package:work_studio/app/storage/variables.dart';
 
@@ -45,45 +44,52 @@ class _HomepageState extends State<Homepage> {
       child: Scaffold(
         backgroundColor: const Color.fromARGB(1, 237, 242, 246),
         appBar: PreferredSize(
-          preferredSize: const Size(60, 0),
+          preferredSize: const Size(60, 40),
           child: MainAppbar(
             webViewController: _controller,
+            logoutMethod: () {
+              logoutUser();
+            },
           ),
         ),
-        body: WebView(
-          initialUrl: widget.mainURL,
-          javascriptMode: JavascriptMode.unrestricted,
-          onWebViewCreated: (WebViewController webViewController) {
-            _controller.future.then(
-              (value) => _webViewController = value,
-            );
+        body: Stack(
+          children: [
+            WebView(
+              initialUrl: widget.mainURL,
+              javascriptMode: JavascriptMode.unrestricted,
+              onWebViewCreated: (WebViewController webViewController) {
+                _controller.future.then(
+                  (value) => _webViewController = value,
+                );
 
-            _controller.complete(webViewController);
-          },
-          onProgress: (int progress) {
-            log(progress.toString());
-          },
-          javascriptChannels: <JavascriptChannel>{
-            _toasterJavascriptChannel(context),
-          },
-          navigationDelegate: (NavigationRequest request) {
-            if (request.url.startsWith(mainApplicationURL + "/login")) {
-              goToLoginpage(context);
-              return NavigationDecision.prevent;
-            }
-            log(request.toString());
-            return NavigationDecision.navigate;
-          },
-          onPageStarted: (String url) {
-            log(url.toString());
-            navigateToNativeLogin(url, context);
-          },
-          onPageFinished: (String url) {
-            setLoginStatus();
-            log(url.toString());
-          },
-          gestureNavigationEnabled: true,
-          backgroundColor: const Color(0x00000000),
+                _controller.complete(webViewController);
+              },
+              onProgress: (int progress) {
+                // log(progress.toString());
+              },
+              javascriptChannels: <JavascriptChannel>{
+                _toasterJavascriptChannel(context),
+              },
+              navigationDelegate: (NavigationRequest request) {
+                if (request.url.startsWith(mainApplicationURL + "/login")) {
+                  goToLoginpage(context);
+                  return NavigationDecision.prevent;
+                }
+                // log(request.url.toString());
+
+                return NavigationDecision.navigate;
+              },
+              onPageStarted: (String url) {
+                // log(url.toString());
+                navigateToNativeLogin(url, context);
+              },
+              onPageFinished: (String url) {
+                // log(url.toString());
+              },
+              gestureNavigationEnabled: true,
+              backgroundColor: const Color(0x00000000),
+            ),
+          ],
         ),
         // bottomNavigationBar: BotttomNavigationBar(
         //   webViewController: _controller,
@@ -92,6 +98,8 @@ class _HomepageState extends State<Homepage> {
       onWillPop: () => _goBack(context),
     );
   }
+
+//---------------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------------
   void goToLoginpage(BuildContext context) {
@@ -157,16 +165,25 @@ class _HomepageState extends State<Homepage> {
   }
 
 //---------------------------------------------------------------------------------
-  void setLoginStatus() async {
-    getCurrentURL();
-    final SharedPreferences _preferences = await _sharedPreferences;
-    _preferences.setBool("isLoggedIn", true);
-  }
 
-  void getCurrentURL() async {
-    _webViewController.goBack();
-    var url = await _webViewController.currentUrl();
-    log(url.toString());
+  // void getCurrentURL() async {
+  //   _webViewController.goBack();
+  //   var url = await _webViewController.currentUrl();
+  //   log(url.toString());
+  // }
+
+//---------------------------------------------------------------------------------
+  void logoutUser() async {
+    final SharedPreferences _preferences = await _sharedPreferences;
+    bool clear = await _preferences.clear();
+    if (clear) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (context) => const LayoutPage(),
+        ),
+        (Route<dynamic> route) => false,
+      );
+    }
   }
   //---------------------------------------------------------------------------------
 }

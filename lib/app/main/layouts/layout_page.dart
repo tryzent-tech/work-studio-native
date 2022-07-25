@@ -1,11 +1,12 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:work_studio/app/login/login.dart';
 import 'package:work_studio/app/main/screens/homepage.dart';
 import 'package:work_studio/app/partials/tools/delete_popup_box.dart';
-import 'package:work_studio/app/storage/variables.dart';
+import 'package:work_studio/app/partials/tools/please_wait_indicator.dart';
+import 'package:work_studio/app/storage/local_storage.dart';
 
 class LayoutPage extends StatefulWidget {
   const LayoutPage({
@@ -16,37 +17,64 @@ class LayoutPage extends StatefulWidget {
 }
 
 class _LayoutPageState extends State<LayoutPage> {
-  final Future<SharedPreferences> _sharedPreferences =
-      SharedPreferences.getInstance();
+  final LocalStorage _localStorage = LocalStorage();
+
+  bool isUserLoggedIn = false;
+  bool isProcessing = true;
+  String mainApplicationURL = "";
 
   @override
   void initState() {
-    // getLoggedInData();
+    getUserInfoFromLocalStorage();
     super.initState();
   }
 
-  void getLoggedInData() async {
-    final SharedPreferences _preferences = await _sharedPreferences;
-    var isUserLoggedIn = _preferences.getBool("isLoggedIn");
-    if (isUserLoggedIn == true) {
-      Navigator.push(context, MaterialPageRoute<void>(
-        builder: (BuildContext context) {
-          return Homepage(mainURL: mainApplicationURL);
-        },
-      ));
+  void getUserInfoFromLocalStorage() async {
+    bool isLoggedIn = await _localStorage.getIsLoggedIn();
+    mainApplicationURL = await _localStorage.getURL();
+    //
+    log(isLoggedIn.toString());
+    log(mainApplicationURL.toString());
+    //
+    if (isLoggedIn && mainApplicationURL != "") {
+      //
+      setState(() => isUserLoggedIn = true);
+      navigateToWebViewPage(mainApplicationURL);
+      //
+    } else {
+      setState(() => isUserLoggedIn = false);
     }
+    setState(() => isProcessing = false);
   }
 
   @override
   Widget build(BuildContext context) {
+    var screenSize = MediaQuery.of(context).size;
+    const backgroundColor = Color.fromARGB(1, 237, 242, 246);
+    //
     return WillPopScope(
       child: GestureDetector(
-        child: Scaffold(
-          backgroundColor: const Color.fromARGB(1, 237, 242, 246),
-          body: Builder(builder: (context) {
-            return const LoginPage();
-          }),
-        ),
+        child: Builder(builder: (context) {
+          if (isProcessing == false && isUserLoggedIn == false) {
+            return Scaffold(
+              backgroundColor: backgroundColor,
+              body: Builder(builder: (context) {
+                return const LoginPage();
+              }),
+            );
+          } else {
+            return Scaffold(
+              backgroundColor: backgroundColor,
+              body: Column(
+                children: [
+                  Builder(builder: (context) {
+                    return pulseProcressbar(screenSize);
+                  }),
+                ],
+              ),
+            );
+          }
+        }),
         onTap: () {
           tapOnWholeScreen(context);
         },
@@ -81,5 +109,18 @@ class _LayoutPageState extends State<LayoutPage> {
       },
     );
   }
+
+  //---------------------------------------------------------------------------------
+  void navigateToWebViewPage(String mainURL) {
+    Navigator.push(
+      context,
+      PageTransition(
+        child: Homepage(mainURL: mainURL),
+        type: PageTransitionType.rightToLeft,
+        duration: const Duration(milliseconds: 300),
+      ),
+    );
+  }
+
   //---------------------------------------------------------------------------------
 }
