@@ -43,7 +43,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.workstudio.io.work_studio"
+        applicationId "com.tryzent.workstudio"
         // minSdkVersion flutter.minSdkVersion
         minSdkVersion 23
         targetSdkVersion flutter.targetSdkVersion

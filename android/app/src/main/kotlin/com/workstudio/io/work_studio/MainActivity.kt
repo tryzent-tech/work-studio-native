@@ -1,4 +1,4 @@
-package com.workstudio.io.work_studio
+package com.tryzent.workstudio
 
 import io.flutter.embedding.android.FlutterActivity
 
