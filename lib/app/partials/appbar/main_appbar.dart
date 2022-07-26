@@ -117,11 +117,10 @@ AppBar buildAppBar2() {
       ),
     ),
     elevation: 20,
-    centerTitle: true,
     shadowColor: Colors.white,
     backgroundColor: Colors.indigo,
     foregroundColor: Colors.amber,
-    toolbarHeight: 55,
+    toolbarHeight: 40,
     titleTextStyle: const TextStyle(
       color: Colors.white,
       fontWeight: FontWeight.bold,
