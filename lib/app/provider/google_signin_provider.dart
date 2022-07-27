@@ -27,14 +27,14 @@ class GoggleSignInProvider extends ChangeNotifier {
         idToken: googleAuth.idToken,
       );
 
-      log(googleAuth.accessToken!);
-      log(googleAuth.idToken!);
-
       await FirebaseAuth.instance.signInWithCredential(credential);
 
       LocalStorage _localStorage = LocalStorage();
       _localStorage.setGoogleIdToken(googleAuth.idToken!);
       _localStorage.setGoogleAccessToken(googleAuth.accessToken!);
+
+      log("Id Token -> " + googleAuth.idToken!);
+      log("Access Token -> " + googleAuth.accessToken!);
 
       notifyListeners();
 

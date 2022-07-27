@@ -29,7 +29,7 @@ class _AdvanceHomepageState extends State<AdvanceHomepage> {
   @override
   void initState() {
     flutterWebViewPlugin.onUrlChanged.listen((url) {
-      log(url.toString());
+      log("Advance Webpage URL ->" + url.toString());
     });
     super.initState();
   }
