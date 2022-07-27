@@ -76,7 +76,7 @@ class _MainAppbarState extends State<MainAppbar> {
 }
 
 //---------------------------------------------------------------------------------
-AppBar buildAppBar1() {
+AppBar workStudioLogoAppbar() {
   return AppBar(
     title: Container(
       child: const Image(
@@ -95,7 +95,7 @@ AppBar buildAppBar1() {
 }
 
 //---------------------------------------------------------------------------------
-AppBar buildAppBar2() {
+AppBar loginPageAppbar() {
   return AppBar(
     title: Container(
       padding: const EdgeInsets.all(0),
@@ -117,13 +117,70 @@ AppBar buildAppBar2() {
       ),
     ),
     elevation: 20,
+    centerTitle: true,
     shadowColor: Colors.white,
     backgroundColor: Colors.indigo,
     foregroundColor: Colors.amber,
-    toolbarHeight: 40,
+    toolbarHeight: 55,
     titleTextStyle: const TextStyle(
       color: Colors.white,
       fontWeight: FontWeight.bold,
     ),
+  );
+}
+
+AppBar buildAdvanceWebpageAppbar(
+    {required Function() onLogout, required Function() onRefresh}) {
+  return AppBar(
+    leadingWidth: 0,
+    leading: Container(),
+    title: Container(
+      padding: const EdgeInsets.all(0),
+      child: Row(
+        children: [
+          Container(
+            child: const Icon(
+              FontAwesomeIcons.infinity,
+              color: Colors.white,
+            ),
+            margin: const EdgeInsets.only(left: 10, right: 15),
+          ),
+          const Text(
+            "Work Studio",
+            style: TextStyle(fontSize: 20),
+          ),
+        ],
+      ),
+    ),
+    titleSpacing: 0,
+    elevation: 20,
+    shadowColor: Colors.white,
+    backgroundColor: Colors.indigo,
+    foregroundColor: Colors.amber,
+    toolbarHeight: 45,
+    titleTextStyle: const TextStyle(
+      color: Colors.white,
+      fontWeight: FontWeight.bold,
+    ),
+    actions: [
+      IconButton(
+        onPressed: onRefresh,
+        splashRadius: 18,
+        icon: const Icon(
+          FontAwesomeIcons.rotateRight,
+          size: 20,
+          color: Colors.white,
+        ),
+      ),
+      IconButton(
+        onPressed: onLogout,
+        splashRadius: 18,
+        icon: const Icon(
+          FontAwesomeIcons.powerOff,
+          size: 20,
+          color: Colors.white,
+        ),
+      ),
+    ],
   );
 }

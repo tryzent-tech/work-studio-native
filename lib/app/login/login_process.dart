@@ -52,7 +52,7 @@ class _LoginProcessState extends State<LoginProcess> {
     var screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
-      appBar: buildAppBar2(),
+      appBar: loginPageAppbar(),
       backgroundColor: Colors.white,
       body: Builder(builder: (context) {
         if (isProcessSocialLogin) {

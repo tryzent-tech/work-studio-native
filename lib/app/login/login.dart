@@ -1,7 +1,6 @@
 // ignore_for_file: avoid_print
 
 import 'dart:convert';
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -10,7 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:work_studio/app/helpers/login_data_modal.dart';
 import 'package:work_studio/app/helpers/login_object_helper.dart';
 import 'package:work_studio/app/helpers/url_helper.dart';
-import 'package:work_studio/app/main/screens/homepage.dart';
+import 'package:work_studio/app/main/screens/advance_homepage.dart';
 import 'package:work_studio/app/modals/otp_response_modal.dart';
 import 'package:work_studio/app/modals/otp_verify_modal.dart';
 import 'package:work_studio/app/partials/appbar/main_appbar.dart';
@@ -56,7 +55,7 @@ class _LoginPageState extends State<LoginPage> {
     var screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
-      appBar: buildAppBar2(),
+      appBar: loginPageAppbar(),
       backgroundColor: Colors.white,
       body: GestureDetector(
         child: SingleChildScrollView(
@@ -422,7 +421,7 @@ class _LoginPageState extends State<LoginPage> {
     Navigator.push(
       context,
       PageTransition(
-        child: Homepage(mainURL: mainURL),
+        child: AdvanceHomepage(mainURL: mainURL),
         type: PageTransitionType.rightToLeft,
         duration: const Duration(milliseconds: 300),
       ),
