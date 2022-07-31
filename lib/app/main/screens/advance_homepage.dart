@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:work_studio/app/login/login.dart';
 import 'package:work_studio/app/main/layouts/layout_page.dart';
 import 'package:work_studio/app/partials/appbar/main_appbar.dart';
 import 'package:work_studio/app/storage/variables.dart';
@@ -28,10 +29,21 @@ class _AdvanceHomepageState extends State<AdvanceHomepage> {
 
   @override
   void initState() {
-    flutterWebViewPlugin.onUrlChanged.listen((url) {
-      log("Advance Webpage URL ->" + url.toString());
-    });
     super.initState();
+    final flutterWebviewPlugin = FlutterWebviewPlugin();
+    flutterWebviewPlugin.onUrlChanged.listen((String url) {
+      log(url);
+      log("Hello World");
+      if (url.contains("/login")) {
+        logoutUser();
+        log("Login -> URL" + url);
+      }
+
+      if (url.contains("/logout")) {
+        log("Logout -> URL" + url);
+        // clearLocalStorage();
+      }
+    });
   }
 
   @override
@@ -54,7 +66,7 @@ class _AdvanceHomepageState extends State<AdvanceHomepage> {
       initialChild: Container(
         color: mainBackgroundColor,
         child: const Center(
-          child: Text('Waiting.....'),
+          child: Text('Loading...'),
         ),
       ),
       // bottomNavigationBar: bottomNavbar(),
@@ -100,6 +112,11 @@ class _AdvanceHomepageState extends State<AdvanceHomepage> {
         (Route<dynamic> route) => false,
       );
     }
+  }
+
+  void clearLocalStorage() async {
+    final SharedPreferences _preferences = await _sharedPreferences;
+    await _preferences.clear();
   }
 }
 

@@ -162,25 +162,25 @@ AppBar buildAdvanceWebpageAppbar(
       color: Colors.white,
       fontWeight: FontWeight.bold,
     ),
-    actions: [
-      IconButton(
-        onPressed: onRefresh,
-        splashRadius: 18,
-        icon: const Icon(
-          FontAwesomeIcons.rotateRight,
-          size: 20,
-          color: Colors.white,
-        ),
-      ),
-      IconButton(
-        onPressed: onLogout,
-        splashRadius: 18,
-        icon: const Icon(
-          FontAwesomeIcons.powerOff,
-          size: 20,
-          color: Colors.white,
-        ),
-      ),
-    ],
+    // actions: [
+    //   IconButton(
+    //     onPressed: onRefresh,
+    //     splashRadius: 18,
+    //     icon: const Icon(
+    //       FontAwesomeIcons.rotateRight,
+    //       size: 20,
+    //       color: Colors.white,
+    //     ),
+    //   ),
+    //   IconButton(
+    //     onPressed: onLogout,
+    //     splashRadius: 18,
+    //     icon: const Icon(
+    //       FontAwesomeIcons.powerOff,
+    //       size: 20,
+    //       color: Colors.white,
+    //     ),
+    //   ),
+    // ],
   );
 }

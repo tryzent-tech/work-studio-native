@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:work_studio/app/main/screens/advance_homepage.dart';
-import 'package:work_studio/app/main/screens/custom_tabs.dart';
 import 'package:work_studio/app/provider/google_signin_provider.dart';
 import 'main/layouts/layout_page.dart';
 

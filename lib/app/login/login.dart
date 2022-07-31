@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print
 
 import 'dart:convert';
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -364,11 +365,12 @@ class _LoginPageState extends State<LoginPage> {
     //
     String idToken = await _localStorage.getGoogleIdToken();
 
-    String mainURL = getDevelopmentURL(base64String, idToken, "not-found");
+    String mainURL = getProductionURL(base64String, idToken, "not-found");
 
     //
     _localStorage.setIsLoggedIn(true);
     _localStorage.setURL(mainURL);
+    log(mainURL);
     //
     navigateToWebViewPage(mainURL);
   }
