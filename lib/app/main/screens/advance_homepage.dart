@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:work_studio/app/login/login.dart';
 import 'package:work_studio/app/main/layouts/layout_page.dart';
 import 'package:work_studio/app/partials/appbar/main_appbar.dart';
 import 'package:work_studio/app/storage/variables.dart';
@@ -33,7 +32,7 @@ class _AdvanceHomepageState extends State<AdvanceHomepage> {
     final flutterWebviewPlugin = FlutterWebviewPlugin();
     flutterWebviewPlugin.onUrlChanged.listen((String url) {
       log(url);
-      log("Hello World");
+
       if (url.contains("/login")) {
         logoutUser();
         log("Login -> URL" + url);
@@ -41,13 +40,14 @@ class _AdvanceHomepageState extends State<AdvanceHomepage> {
 
       if (url.contains("/logout")) {
         log("Logout -> URL" + url);
-        // clearLocalStorage();
+        clearLocalStorage();
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    // var screenSize = MediaQuery.of(context).size;
     return WebviewScaffold(
       url: widget.mainURL,
       javascriptChannels: jsChannels,
@@ -65,8 +65,16 @@ class _AdvanceHomepageState extends State<AdvanceHomepage> {
       hidden: false,
       initialChild: Container(
         color: mainBackgroundColor,
+        //  child: pulseProcressbar(screenSize, 80),
         child: const Center(
-          child: Text('Loading...'),
+          child: Text(
+            'Loading...',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF656565),
+            ),
+          ),
         ),
       ),
       // bottomNavigationBar: bottomNavbar(),

@@ -76,7 +76,7 @@ class _LoginPageState extends State<LoginPage> {
                       if (!isPhoneNumberSent) {
                         return Column(
                           children: [
-                            const SizedBox(height: 5),
+                            const SizedBox(height: 8),
                             mobileNumberFormField(),
                           ],
                         );
@@ -337,6 +337,7 @@ class _LoginPageState extends State<LoginPage> {
     var accessToken = verifyOtpResponseModal.data.accessToken;
 
     String mainURL = getDevelopmentURL(base64String, "not-found", accessToken);
+    // String mainURL = getProductionURL(base64String, "not-found", accessToken);
 
     _localStorage.setIsLoggedIn(true);
     _localStorage.setURL(mainURL);
@@ -365,6 +366,7 @@ class _LoginPageState extends State<LoginPage> {
     //
     String idToken = await _localStorage.getGoogleIdToken();
 
+    // String mainURL = getDevelopmentURL(base64String, idToken, "not-found");
     String mainURL = getProductionURL(base64String, idToken, "not-found");
 
     //
@@ -408,8 +410,10 @@ class _LoginPageState extends State<LoginPage> {
     List<int> bytes = utf8.encode(rawJson);
     final base64String = base64.encode(bytes);
 
+    // String mainURL =
+    //     getDevelopmentURL(base64String, "not-found", accessToken!.token);
     String mainURL =
-        getDevelopmentURL(base64String, "not-found", accessToken!.token);
+        getProductionURL(base64String, "not-found", accessToken!.token);
 
     _localStorage.setIsLoggedIn(true);
     _localStorage.setURL(mainURL);

@@ -35,21 +35,21 @@ Container randomTextField({
         contentPadding: const EdgeInsets.all(15),
         focusedBorder: OutlineInputBorder(
           borderSide: const BorderSide(color: Colors.blue, width: 1),
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(6),
         ),
         enabledBorder: OutlineInputBorder(
           borderSide: const BorderSide(color: Colors.grey, width: 1),
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(6),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderSide: const BorderSide(
               color: Color.fromARGB(255, 236, 21, 21), width: 2),
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(6),
         ),
         errorBorder: OutlineInputBorder(
           borderSide: const BorderSide(
               color: Color.fromARGB(255, 236, 21, 21), width: 2),
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(6),
         ),
       ),
       onChanged: (value) {

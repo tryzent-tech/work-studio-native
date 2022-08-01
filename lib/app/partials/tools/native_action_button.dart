@@ -22,7 +22,7 @@ Row nativeActionButton(
               primary: const Color.fromARGB(255, 108, 88, 206),
               onPrimary: Colors.white,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(32.0),
+                borderRadius: BorderRadius.circular(6),
               ),
             ),
           ),
