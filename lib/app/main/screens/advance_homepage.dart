@@ -33,26 +33,51 @@ class _AdvanceHomepageState extends State<AdvanceHomepage> {
   void initState() {
     super.initState();
     final flutterWebviewPlugin = FlutterWebviewPlugin();
-    flutterWebviewPlugin.onUrlChanged.listen((String url) {
-      log(url);
 
+    String _tempURL = "";
+    flutterWebviewPlugin.onUrlChanged.listen((String url) {
+      //
+      log("APPLICATION URL ------ " + url);
+      //
       if (url.contains("/login")) {
         logoutUser();
       } else if (url.contains("/logout")) {
         clearLocalStorage();
-      } else if (url.contains("/native-meeting-sdk/google-meeting")) {
-        navigateToGoogleMeetSDKPage();
-      } else if (url.contains("/native-meeting-sdk/zoom-meeting")) {
-        navigateToZoomMeetingSDKPage();
-      } else {
-        log(url);
-      }
+        //
+      } else if (url.contains(googleMeetWebSdkURL)) {
+        if (_tempURL != googleMeetWebSdkURL) {
+          //
+          setState(() => _tempURL = googleMeetWebSdkURL);
+          navigateToGoogleMeetSDKPage();
+          //
+        }
+      } else if (url.contains(zoomMeetingWebSdkURL)) {
+        if (_tempURL != zoomMeetingWebSdkURL) {
+          //
+          setState(() => _tempURL = zoomMeetingWebSdkURL);
+          navigateToZoomMeetingSDKPage();
+        }
+      } else {}
     });
+
+    getCurrentWEBViewURL();
   }
 
   @override
   Widget build(BuildContext context) {
     return webviewScaffoldWidget(mainURL: widget.mainURL);
+  }
+
+//---------------------------------------------------------------------------------
+  void getCurrentWEBViewURL() {
+    flutterWebViewPlugin.onProgressChanged.listen((double value) {
+      log(value.toString());
+      final future =
+          flutterWebViewPlugin.evalJavascript('window.location.href');
+      future.then((String? result) {
+        log(result.toString());
+      });
+    });
   }
 
 //---------------------------------------------------------------------------------
@@ -171,6 +196,6 @@ final Set<JavascriptChannel> jsChannels = [
   JavascriptChannel(
       name: 'Print',
       onMessageReceived: (JavascriptMessage message) {
-        print(message.message);
+        print("Hello Message" + message.message);
       }),
 ].toSet();
