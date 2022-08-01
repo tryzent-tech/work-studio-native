@@ -366,8 +366,8 @@ class _LoginPageState extends State<LoginPage> {
     //
     String idToken = await _localStorage.getGoogleIdToken();
 
-    // String mainURL = getDevelopmentURL(base64String, idToken, "not-found");
-    String mainURL = getProductionURL(base64String, idToken, "not-found");
+    String mainURL = getDevelopmentURL(base64String, idToken, "not-found");
+    // String mainURL = getProductionURL(base64String, idToken, "not-found");
 
     //
     _localStorage.setIsLoggedIn(true);
@@ -410,10 +410,10 @@ class _LoginPageState extends State<LoginPage> {
     List<int> bytes = utf8.encode(rawJson);
     final base64String = base64.encode(bytes);
 
-    // String mainURL =
-    //     getDevelopmentURL(base64String, "not-found", accessToken!.token);
     String mainURL =
-        getProductionURL(base64String, "not-found", accessToken!.token);
+        getDevelopmentURL(base64String, "not-found", accessToken!.token);
+    // String mainURL =
+    //     getProductionURL(base64String, "not-found", accessToken!.token);
 
     _localStorage.setIsLoggedIn(true);
     _localStorage.setURL(mainURL);
