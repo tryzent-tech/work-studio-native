@@ -2,9 +2,11 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
 
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:work_studio/app/main/layouts/layout_page.dart';
 import 'package:work_studio/app/main/screens/google_meet_sdk.dart';
@@ -29,6 +31,8 @@ class _AdvanceHomepageState extends State<AdvanceHomepage>
   final Future<SharedPreferences> _sharedPreferences =
       SharedPreferences.getInstance();
 
+  double completeProgress = 1.0;
+
   @override
   void initState() {
     WidgetsBinding.instance.addObserver(this);
@@ -39,7 +43,8 @@ class _AdvanceHomepageState extends State<AdvanceHomepage>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    log('state OM = $state');
+    log('Application State = $state');
+    if (state == AppLifecycleState.resumed) {}
   }
 
   @override
@@ -58,14 +63,37 @@ class _AdvanceHomepageState extends State<AdvanceHomepage>
     return WebviewScaffold(
       url: mainURL,
       mediaPlaybackRequiresUserGesture: false,
-      appBar: buildAdvanceWebpageAppbar(
-        onLogout: () {
-          logoutUser();
-        },
-        onRefresh: () {
-          flutterWebViewPlugin.reload();
-        },
+      appBar: PreferredSize(
+        preferredSize: const Size(60, 100),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              buildAdvanceWebpageAppbar(
+                onLogout: () {
+                  logoutUser();
+                },
+                onRefresh: () {
+                  flutterWebViewPlugin.reload();
+                },
+              ),
+              Container(
+                padding: const EdgeInsets.all(0),
+                child: LinearPercentIndicator(
+                  lineHeight: 6,
+                  animationDuration: 3000,
+                  padding: const EdgeInsets.all(0),
+                  percent: completeProgress,
+                  animateFromLastPercent: true,
+                  backgroundColor: mainBackgroundColor,
+                  // progressColor: Colors.tealAccent.shade400,
+                  progressColor: const Color.fromARGB(255, 106, 225, 234),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
+
       withZoom: true,
       withLocalStorage: true,
       hidden: false,
@@ -117,24 +145,61 @@ class _AdvanceHomepageState extends State<AdvanceHomepage>
 //---------------------------------------------------------------------------------
   void changeURLListner() {
     final flutterWebviewPlugin = FlutterWebviewPlugin();
-    String _tempURL = "";
+
     flutterWebviewPlugin.onUrlChanged.listen((String url) {
       if (url.contains("/login")) {
         logoutUser();
       } else if (url.contains("/logout")) {
         clearLocalStorage();
       } else if (url.contains(googleMeetWebSdkURL)) {
-        if (_tempURL != googleMeetWebSdkURL) {
-          setState(() => _tempURL = googleMeetWebSdkURL);
-          navigateToGoogleMeetSDKPage();
-        }
+        navigateToGoogleMeetSDKPage();
       } else if (url.contains(zoomMeetingWebSdkURL)) {
-        if (_tempURL != zoomMeetingWebSdkURL) {
-          setState(() => _tempURL = zoomMeetingWebSdkURL);
-          navigateToZoomMeetingSDKPage();
-        }
+        navigateToZoomMeetingSDKPage();
+      } else if (url.contains(nativeSdkJoinMeetingURL)) {
+        joinMeetingByCustomTab(meetingURL: url);
       } else {}
     });
+  }
+
+  //---------------------------------------------------------------------------------
+  void joinMeetingByCustomTab({required String meetingURL}) {
+    var uri = Uri.dataFromString(meetingURL);
+    Map<String, String> params = uri.queryParameters;
+    String? meetingURLString = params['meetingURL'];
+    String? newURL = meetingURLString?.replaceAll(RegExp("%2F"), "/");
+    log(newURL.toString());
+    launchURLInCustomTab(context, newURL.toString());
+  }
+
+//---------------------------------------------------------------------------------
+  Future<void> launchURLInCustomTab(BuildContext context, String url) async {
+    final theme = Theme.of(context);
+    try {
+      await launch(
+        // url,
+        'https://zoom.us/j/84841031424?pwd=b0I1TUhnVnBQRFo1d3RQWktwVVZCQT09',
+        customTabsOption: CustomTabsOption(
+          toolbarColor: Colors.indigo,
+          enableDefaultShare: false,
+          enableUrlBarHiding: true,
+          showPageTitle: false,
+          animation: CustomTabsSystemAnimation.slideIn(),
+          extraCustomTabs: const <String>[
+            'org.mozilla.firefox',
+            'com.microsoft.emmx',
+          ],
+        ),
+        safariVCOption: SafariViewControllerOption(
+          preferredBarTintColor: theme.primaryColor,
+          preferredControlTintColor: Colors.white,
+          barCollapsingEnabled: true,
+          entersReaderIfAvailable: false,
+          dismissButtonStyle: SafariViewControllerDismissButtonStyle.close,
+        ),
+      );
+    } catch (e) {
+      debugPrint(e.toString());
+    }
   }
 
   //---------------------------------------------------------------------------------
@@ -142,6 +207,10 @@ class _AdvanceHomepageState extends State<AdvanceHomepage>
     LocalStorage _localStorage = LocalStorage();
 
     flutterWebViewPlugin.onProgressChanged.listen((double value) {
+      log(value.toString());
+      setState(() {
+        completeProgress = value;
+      });
       var jsFunction = 'window.location.href';
 
       final future = flutterWebViewPlugin.evalJavascript(jsFunction);

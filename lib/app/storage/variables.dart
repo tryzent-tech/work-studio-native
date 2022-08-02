@@ -13,3 +13,5 @@ const kAndroidUserAgent =
 String googleMeetWebSdkURL = "/native-meeting-sdk/google-meeting";
 
 String zoomMeetingWebSdkURL = "/native-meeting-sdk/zoom-meeting";
+
+String nativeSdkJoinMeetingURL = "/native-sdk-join-meeting";
