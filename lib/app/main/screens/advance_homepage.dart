@@ -85,8 +85,7 @@ class _AdvanceHomepageState extends State<AdvanceHomepage>
                   percent: completeProgress,
                   animateFromLastPercent: true,
                   backgroundColor: mainBackgroundColor,
-                  // progressColor: Colors.tealAccent.shade400,
-                  progressColor: const Color.fromARGB(255, 106, 225, 234),
+                  progressColor: const Color.fromARGB(255, 113, 165, 255),
                 ),
               ),
             ],
@@ -163,21 +162,22 @@ class _AdvanceHomepageState extends State<AdvanceHomepage>
 
   //---------------------------------------------------------------------------------
   void joinMeetingByCustomTab({required String meetingURL}) {
-    var uri = Uri.dataFromString(meetingURL);
-    Map<String, String> params = uri.queryParameters;
+    var stringURI = Uri.dataFromString(Uri.decodeFull(meetingURL));
+    Map<String, String> params = stringURI.queryParameters;
     String? meetingURLString = params['meetingURL'];
-    String? newURL = meetingURLString?.replaceAll(RegExp("%2F"), "/");
-    log(newURL.toString());
-    launchURLInCustomTab(context, newURL.toString());
+
+    log(meetingURLString.toString());
+
+    launchURLInCustomTab(context, meetingURLString.toString());
   }
 
 //---------------------------------------------------------------------------------
-  Future<void> launchURLInCustomTab(BuildContext context, String url) async {
+  Future<void> launchURLInCustomTab(
+      BuildContext context, String stringURL) async {
     final theme = Theme.of(context);
     try {
       await launch(
-        // url,
-        'https://zoom.us/j/84841031424?pwd=b0I1TUhnVnBQRFo1d3RQWktwVVZCQT09',
+        stringURL,
         customTabsOption: CustomTabsOption(
           toolbarColor: Colors.indigo,
           enableDefaultShare: false,
