@@ -10,9 +10,8 @@ import 'package:work_studio/app/main/layouts/layout_page.dart';
 import 'package:work_studio/app/main/screens/google_meet_sdk.dart';
 import 'package:work_studio/app/main/screens/zoom_meet_sdk.dart';
 import 'package:work_studio/app/partials/appbar/main_appbar.dart';
+import 'package:work_studio/app/storage/local_storage.dart';
 import 'package:work_studio/app/storage/variables.dart';
-
-String selectedUrl = 'https://flutter.io';
 
 class AdvanceHomepage extends StatefulWidget {
   final String mainURL;
@@ -23,7 +22,8 @@ class AdvanceHomepage extends StatefulWidget {
   State<AdvanceHomepage> createState() => _AdvanceHomepageState();
 }
 
-class _AdvanceHomepageState extends State<AdvanceHomepage> {
+class _AdvanceHomepageState extends State<AdvanceHomepage>
+    with WidgetsBindingObserver {
   final flutterWebViewPlugin = FlutterWebviewPlugin();
 
   final Future<SharedPreferences> _sharedPreferences =
@@ -31,36 +31,21 @@ class _AdvanceHomepageState extends State<AdvanceHomepage> {
 
   @override
   void initState() {
+    WidgetsBinding.instance.addObserver(this);
     super.initState();
-    final flutterWebviewPlugin = FlutterWebviewPlugin();
-
-    String _tempURL = "";
-    flutterWebviewPlugin.onUrlChanged.listen((String url) {
-      //
-      log("APPLICATION URL ------ " + url);
-      //
-      if (url.contains("/login")) {
-        logoutUser();
-      } else if (url.contains("/logout")) {
-        clearLocalStorage();
-        //
-      } else if (url.contains(googleMeetWebSdkURL)) {
-        if (_tempURL != googleMeetWebSdkURL) {
-          //
-          setState(() => _tempURL = googleMeetWebSdkURL);
-          navigateToGoogleMeetSDKPage();
-          //
-        }
-      } else if (url.contains(zoomMeetingWebSdkURL)) {
-        if (_tempURL != zoomMeetingWebSdkURL) {
-          //
-          setState(() => _tempURL = zoomMeetingWebSdkURL);
-          navigateToZoomMeetingSDKPage();
-        }
-      } else {}
-    });
-
+    changeURLListner();
     getCurrentWEBViewURL();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    log('state OM = $state');
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   @override
@@ -69,22 +54,9 @@ class _AdvanceHomepageState extends State<AdvanceHomepage> {
   }
 
 //---------------------------------------------------------------------------------
-  void getCurrentWEBViewURL() {
-    flutterWebViewPlugin.onProgressChanged.listen((double value) {
-      log(value.toString());
-      final future =
-          flutterWebViewPlugin.evalJavascript('window.location.href');
-      future.then((String? result) {
-        log(result.toString());
-      });
-    });
-  }
-
-//---------------------------------------------------------------------------------
   WebviewScaffold webviewScaffoldWidget({required String mainURL}) {
     return WebviewScaffold(
       url: mainURL,
-      javascriptChannels: jsChannels,
       mediaPlaybackRequiresUserGesture: false,
       appBar: buildAdvanceWebpageAppbar(
         onLogout: () {
@@ -99,7 +71,6 @@ class _AdvanceHomepageState extends State<AdvanceHomepage> {
       hidden: false,
       initialChild: Container(
         color: mainBackgroundColor,
-        //  child: pulseProcressbar(screenSize, 80),
         child: const Center(
           child: Text(
             'Loading...',
@@ -143,6 +114,55 @@ class _AdvanceHomepageState extends State<AdvanceHomepage> {
     );
   }
 
+//---------------------------------------------------------------------------------
+  void changeURLListner() {
+    final flutterWebviewPlugin = FlutterWebviewPlugin();
+    String _tempURL = "";
+    flutterWebviewPlugin.onUrlChanged.listen((String url) {
+      if (url.contains("/login")) {
+        logoutUser();
+      } else if (url.contains("/logout")) {
+        clearLocalStorage();
+      } else if (url.contains(googleMeetWebSdkURL)) {
+        if (_tempURL != googleMeetWebSdkURL) {
+          setState(() => _tempURL = googleMeetWebSdkURL);
+          navigateToGoogleMeetSDKPage();
+        }
+      } else if (url.contains(zoomMeetingWebSdkURL)) {
+        if (_tempURL != zoomMeetingWebSdkURL) {
+          setState(() => _tempURL = zoomMeetingWebSdkURL);
+          navigateToZoomMeetingSDKPage();
+        }
+      } else {}
+    });
+  }
+
+  //---------------------------------------------------------------------------------
+  void getCurrentWEBViewURL() {
+    LocalStorage _localStorage = LocalStorage();
+
+    flutterWebViewPlugin.onProgressChanged.listen((double value) {
+      var jsFunction = 'window.location.href';
+
+      final future = flutterWebViewPlugin.evalJavascript(jsFunction);
+
+      future.then((String? currentPageURL) {
+        if (value == 1.0) {
+          _localStorage.setCurrentPageURL(currentPageURL.toString());
+          getCurrentPageURL();
+        }
+      });
+    });
+  }
+
+//---------------------------------------------------------------------------------
+  void getCurrentPageURL() async {
+    LocalStorage _localStorage = LocalStorage();
+    String currentPageURL2 = await _localStorage.getCurrentPageURL();
+    log(currentPageURL2);
+  }
+//---------------------------------------------------------------------------------
+
   void logoutUser() async {
     final SharedPreferences _preferences = await _sharedPreferences;
     bool clear = await _preferences.clear();
@@ -155,11 +175,13 @@ class _AdvanceHomepageState extends State<AdvanceHomepage> {
       );
     }
   }
+//---------------------------------------------------------------------------------
 
   void clearLocalStorage() async {
     final SharedPreferences _preferences = await _sharedPreferences;
     await _preferences.clear();
   }
+//---------------------------------------------------------------------------------
 
   void navigateToGoogleMeetSDKPage() {
     final flutterWebviewPlugin = FlutterWebviewPlugin();
@@ -174,6 +196,7 @@ class _AdvanceHomepageState extends State<AdvanceHomepage> {
       ),
     );
   }
+//---------------------------------------------------------------------------------
 
   void navigateToZoomMeetingSDKPage() {
     final flutterWebviewPlugin = FlutterWebviewPlugin();
@@ -188,14 +211,6 @@ class _AdvanceHomepageState extends State<AdvanceHomepage> {
       ),
     );
   }
-}
-
 //---------------------------------------------------------------------------------
-// ignore: prefer_collection_literals
-final Set<JavascriptChannel> jsChannels = [
-  JavascriptChannel(
-      name: 'Print',
-      onMessageReceived: (JavascriptMessage message) {
-        print("Hello Message" + message.message);
-      }),
-].toSet();
+
+}

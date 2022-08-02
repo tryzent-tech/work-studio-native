@@ -57,4 +57,15 @@ class LocalStorage {
     String? accessToken = prefs.getString('facebookAccessToken') ?? "";
     return accessToken;
   }
+
+  setCurrentPageURL(String url) async {
+    final SharedPreferences _preferences = await _sharedPreferences;
+    _preferences.setString("currentPageURL", url);
+  }
+
+  Future<String> getCurrentPageURL() async {
+    final SharedPreferences prefs = await _sharedPreferences;
+    String? currentPageURL = prefs.getString('currentPageURL') ?? "";
+    return currentPageURL;
+  }
 }
