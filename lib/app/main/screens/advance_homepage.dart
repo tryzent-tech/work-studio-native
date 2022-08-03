@@ -161,7 +161,7 @@ class _AdvanceHomepageState extends State<AdvanceHomepage>
   }
 
   //---------------------------------------------------------------------------------
-  void joinMeetingByCustomTab({required String meetingURL}) {
+  void joinMeetingByCustomTab({required String meetingURL}) async {
     var stringURI = Uri.dataFromString(Uri.decodeFull(meetingURL));
     Map<String, String> params = stringURI.queryParameters;
     String? meetingURLString = params['meetingURL'];

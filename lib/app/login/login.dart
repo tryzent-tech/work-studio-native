@@ -14,6 +14,7 @@ import 'package:work_studio/app/main/screens/advance_homepage.dart';
 import 'package:work_studio/app/modals/otp_response_modal.dart';
 import 'package:work_studio/app/modals/otp_verify_modal.dart';
 import 'package:work_studio/app/partials/appbar/main_appbar.dart';
+import 'package:work_studio/app/partials/sidebar/main-sidebar.dart';
 import 'package:work_studio/app/partials/tools/native_action_button.dart';
 import 'package:work_studio/app/partials/tools/please_wait_indicator.dart';
 import 'package:work_studio/app/partials/tools/snackbar.dart';
@@ -57,6 +58,7 @@ class _LoginPageState extends State<LoginPage> {
 
     return Scaffold(
       appBar: loginPageAppbar(),
+      drawer: const MainSidebar(),
       backgroundColor: Colors.white,
       body: GestureDetector(
         child: SingleChildScrollView(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
+import 'package:work_studio/app/storage/variables.dart';
 
 class FlutterCustomTabs extends StatefulWidget {
   const FlutterCustomTabs({Key? key}) : super(key: key);
@@ -11,23 +11,21 @@ class FlutterCustomTabs extends StatefulWidget {
 
 class _FlutterCustomTabsState extends State<FlutterCustomTabs> {
   @override
+  void initState() {
+    super.initState();
+    launchCustomTab();
+  }
+
+  void launchCustomTab() {
+    Future.delayed(const Duration(seconds: 1), () {
+      _launchURL(context);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Builder(
-      builder: (_context) => Scaffold(
-        appBar: AppBar(
-          title: const Text('Flutter Custom Tabs Example'),
-          systemOverlayStyle: SystemUiOverlayStyle.dark,
-        ),
-        body: Center(
-          child: TextButton(
-            onPressed: () => _launchURL(_context),
-            child: const Text(
-              'Show Flutter homepage',
-              style: TextStyle(fontSize: 17),
-            ),
-          ),
-        ),
-      ),
+    return Scaffold(
+      backgroundColor: mainBackgroundColor,
     );
   }
 
@@ -35,10 +33,10 @@ class _FlutterCustomTabsState extends State<FlutterCustomTabs> {
     final theme = Theme.of(context);
     try {
       await launch(
-        'https://network.tryzent.com/',
+        mainApplicationURL,
         customTabsOption: CustomTabsOption(
           toolbarColor: Colors.indigo,
-          enableDefaultShare: false,
+          enableDefaultShare: true,
           enableUrlBarHiding: true,
           showPageTitle: false,
           animation: CustomTabsSystemAnimation.slideIn(),

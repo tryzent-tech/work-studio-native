@@ -97,27 +97,48 @@ AppBar workStudioLogoAppbar() {
 //---------------------------------------------------------------------------------
 AppBar loginPageAppbar() {
   return AppBar(
+    // title: Container(
+    //   padding: const EdgeInsets.all(0),
+    //   child: Row(
+    //     mainAxisAlignment: MainAxisAlignment.center,
+    //     children: [
+    //       Container(
+    //         child: const Icon(
+    //           FontAwesomeIcons.infinity,
+    //           color: Colors.white,
+    //         ),
+    //         margin: const EdgeInsets.symmetric(horizontal: 16),
+    //       ),
+    //       const Text(
+    //         "Work Studio",
+    //         style: TextStyle(fontSize: 20),
+    //       ),
+    //     ],
+    //   ),
+    // ),
+    leadingWidth: 36,
     title: Container(
       padding: const EdgeInsets.all(0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            child: const Icon(
-              FontAwesomeIcons.infinity,
-              color: Colors.white,
-            ),
-            margin: const EdgeInsets.symmetric(horizontal: 16),
-          ),
-          const Text(
-            "Work Studio",
-            style: TextStyle(fontSize: 20),
-          ),
-        ],
+      child: const Text(
+        "Work Studio",
+        style: TextStyle(fontSize: 20),
+      ),
+    ),
+    leading: Builder(
+      builder: (context) => IconButton(
+        iconSize: 26,
+        splashRadius: 26,
+        hoverColor: Colors.white24,
+        splashColor: Colors.white,
+        icon: const Icon(
+          FontAwesomeIcons.infinity,
+          color: Colors.white,
+        ),
+        onPressed: () => Scaffold.of(context).openDrawer(),
       ),
     ),
     elevation: 20,
-    centerTitle: true,
+    centerTitle: false,
     shadowColor: Colors.white,
     backgroundColor: Colors.indigo,
     foregroundColor: Colors.amber,
