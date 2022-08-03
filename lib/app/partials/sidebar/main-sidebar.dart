@@ -164,8 +164,8 @@ class _MainSidebarState extends State<MainSidebar> {
         mainApplicationURL,
         customTabsOption: customTab.CustomTabsOption(
           toolbarColor: Colors.indigo,
-          enableDefaultShare: true,
-          enableUrlBarHiding: true,
+          enableDefaultShare: false,
+          enableUrlBarHiding: false,
           showPageTitle: false,
           animation: customTab.CustomTabsSystemAnimation.slideIn(),
           extraCustomTabs: const <String>[
